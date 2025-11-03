@@ -5,7 +5,7 @@ import { Event } from '../types';
 
 // ! Hard 여기 제공 안함
 export const setupMockHandlerCreation = (initEvents = [] as Event[]) => {
-  let mockEvents: Event[] = [...initEvents];
+  const mockEvents: Event[] = [...initEvents];
 
   server.use(
     http.get('/api/events', () => {
@@ -13,11 +13,7 @@ export const setupMockHandlerCreation = (initEvents = [] as Event[]) => {
     }),
     http.post('/api/events', async ({ request }) => {
       const newEvent = (await request.json()) as Event;
-      // ID가 없는 경우에만 생성
-      // <!-- ID가 없는 경우에만 생성 -->
-      if (!newEvent.id) {
-        newEvent.id = String(mockEvents.length + 1);
-      }
+      newEvent.id = String(mockEvents.length + 1); // 간단한 ID 생성
       mockEvents.push(newEvent);
       return HttpResponse.json(newEvent, { status: 201 });
     })
@@ -149,25 +145,13 @@ export const setupMockHandlerRecurringListUpdate = (initEvents = [] as Event[]) 
     http.get('/api/events', () => {
       return HttpResponse.json({ events: mockEvents });
     }),
-    http.post('/api/events-list', async ({ request }) => {
-      const eventsRequest = (await request.json()) as { events: Event[] };
-      const newEvents = eventsRequest.events.map((event, index) => ({
-        ...event,
-        id: String(mockEvents.length + index + 1),
-      }));
-      mockEvents.push(...newEvents);
-      return HttpResponse.json(newEvents, { status: 201 });
-    }),
     http.put('/api/events/:id', async ({ params, request }) => {
       const { id } = params;
       const updatedEvent = (await request.json()) as Event;
       const index = mockEvents.findIndex((event) => event.id === id);
 
-      if (index !== -1) {
-        mockEvents[index] = { ...mockEvents[index], ...updatedEvent };
-        return HttpResponse.json(mockEvents[index]);
-      }
-      return new HttpResponse(null, { status: 404 });
+      mockEvents[index] = { ...mockEvents[index], ...updatedEvent };
+      return HttpResponse.json(mockEvents[index]);
     }),
     http.put('/api/recurring-events/:repeatId', async ({ params, request }) => {
       const { repeatId } = params;
