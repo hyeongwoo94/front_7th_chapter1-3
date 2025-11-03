@@ -40,7 +40,11 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
   const saveEvent = async (eventData: Event | EventForm) => {
     try {
       let response;
-      if (editing) {
+      // Check if eventData has an id (means it's an existing event to update)
+      // <!-- eventData에 id가 있는지 확인 (기존 이벤트 업데이트를 의미) -->
+      const isUpdate = editing || !!(eventData as Event).id;
+
+      if (isUpdate) {
         const editingEvent = {
           ...eventData,
           // ! TEST CASE
@@ -70,9 +74,12 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
       await fetchEvents();
       onSave?.();
-      enqueueSnackbar(editing ? SUCCESS_MESSAGES.EVENT_UPDATED : SUCCESS_MESSAGES.EVENT_ADDED, {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        isUpdate ? SUCCESS_MESSAGES.EVENT_UPDATED : SUCCESS_MESSAGES.EVENT_ADDED,
+        {
+          variant: 'success',
+        }
+      );
     } catch (error) {
       console.error('Error saving event:', error);
       enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });

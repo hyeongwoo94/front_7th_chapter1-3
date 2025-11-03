@@ -150,17 +150,11 @@ function App() {
       return;
     }
 
-    // Set editingEvent temporarily to use PUT method
-    // <!-- PUT 메서드를 사용하기 위해 editingEvent 임시 설정 -->
-    setEditingEvent(event);
-
-    // Update event with new date/time (saveEvent will show success message)
-    // <!-- 새 날짜/시간으로 일정 업데이트 (saveEvent가 성공 메시지를 표시함) -->
-    try {
-      await saveEvent(updatedEvent);
-    } finally {
-      setEditingEvent(null);
-    }
+    // Update event with new date/time
+    // updatedEvent already has the event.id, so saveEvent will use PUT method
+    // <!-- 새 날짜/시간으로 일정 업데이트 -->
+    // <!-- updatedEvent는 이미 event.id를 가지고 있으므로 saveEvent가 PUT 메서드를 사용함 -->
+    await saveEvent(updatedEvent);
   };
 
   const addOrUpdateEvent = async () => {

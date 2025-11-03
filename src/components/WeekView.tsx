@@ -72,6 +72,7 @@ export default function WeekView({
   const weekDates = getWeekDates(currentDate);
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
   const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
+  const [highlightedCell, setHighlightedCell] = useState<HTMLElement | null>(null);
 
   const handleMouseDown = (event: Event, e: React.MouseEvent) => {
     if (onEventDrop) {
@@ -82,61 +83,84 @@ export default function WeekView({
     }
   };
 
+  // MouseUp is now handled globally in useEffect
+  // <!-- MouseUp은 이제 useEffect에서 전역으로 처리됨 -->
   const handleMouseUp = (e: React.MouseEvent) => {
     e.stopPropagation();
-
-    if (draggedEvent && onEventDrop && dragStartPosition) {
-      // Check if mouse moved enough to consider it a drag (not just a click)
-      // <!-- 드래그로 간주할 만큼 마우스가 이동했는지 확인 (단순 클릭 아님) -->
-      const moveDistance = Math.sqrt(
-        Math.pow(e.clientX - dragStartPosition.x, 2) + Math.pow(e.clientY - dragStartPosition.y, 2)
-      );
-
-      // Only process if moved more than 5 pixels
-      // <!-- 5픽셀 이상 이동한 경우에만 처리 -->
-      if (moveDistance > 5) {
-        const target = e.target as HTMLElement;
-        const cell = target.closest('td') as HTMLElement;
-
-        // Make sure we're not dropping on the same cell or event box
-        // <!-- 같은 셀이나 이벤트 박스에 드롭하지 않았는지 확인 -->
-        const eventBox = target.closest('div[class*="Box"]');
-        if (cell && !eventBox?.closest('td')?.isSameNode(cell)) {
-          // Extract date from cell
-          // <!-- 셀에서 날짜 추출 -->
-          const dateText = cell.querySelector('p[class*="Typography"]')?.textContent;
-          if (dateText) {
-            const day = parseInt(dateText, 10);
-            if (!isNaN(day)) {
-              // Find the date from weekDates
-              // <!-- weekDates에서 날짜 찾기 -->
-              const targetDate = weekDates.find((d) => d.getDate() === day);
-              if (targetDate) {
-                const year = targetDate.getFullYear();
-                const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-                const dayStr = String(targetDate.getDate()).padStart(2, '0');
-                const newDate = `${year}-${month}-${dayStr}`;
-
-                // Calculate time from Y position (simplified - keep original time for now)
-                // <!-- Y 위치에서 시간 계산 (단순화 - 현재는 원본 시간 유지) -->
-                onEventDrop(draggedEvent, newDate, draggedEvent.startTime, draggedEvent.endTime);
-              }
-            }
-          }
-        }
-      }
-
-      setDraggedEvent(null);
-      setDragStartPosition(null);
-    }
+    // Actual drop handling is done in global mouseup event
+    // <!-- 실제 드롭 처리는 전역 mouseup 이벤트에서 수행됨 -->
   };
 
   useEffect(() => {
-    if (draggedEvent) {
-      const handleMouseMove = () => {
+    if (draggedEvent && dragStartPosition) {
+      const handleMouseMove = (e: MouseEvent) => {
         document.body.style.cursor = 'grabbing';
+
+        // Find cell under mouse cursor
+        // <!-- 마우스 커서 아래의 셀 찾기 -->
+        const elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+        const cell = elementUnderMouse?.closest('td') as HTMLElement;
+
+        // Remove previous highlight
+        // <!-- 이전 하이라이트 제거 -->
+        if (highlightedCell && highlightedCell !== cell) {
+          highlightedCell.style.backgroundColor = '';
+        }
+
+        // Highlight new cell if valid and different from original date
+        // <!-- 새 셀 하이라이트 (유효하고 원본 날짜와 다른 경우) -->
+        if (cell) {
+          const cellDate = cell.getAttribute('data-date');
+          if (cellDate && cellDate !== draggedEvent.date) {
+            cell.style.backgroundColor = '#e3f2fd'; // Light blue highlight
+            // <!-- 연한 파란색 하이라이트 -->
+            setHighlightedCell(cell);
+          } else if (cellDate === draggedEvent.date) {
+            // Don't highlight original date cell
+            // <!-- 원본 날짜 셀은 하이라이트하지 않음 -->
+            cell.style.backgroundColor = '';
+            setHighlightedCell(null);
+          }
+        }
       };
-      const handleMouseUpGlobal = () => {
+
+      const handleMouseUpGlobal = (e: MouseEvent) => {
+        // Check if mouse moved enough to consider it a drag (not just a click)
+        // <!-- 드래그로 간주할 만큼 마우스가 이동했는지 확인 (단순 클릭 아님) -->
+        const moveDistance = Math.sqrt(
+          Math.pow(e.clientX - dragStartPosition.x, 2) + Math.pow(e.clientY - dragStartPosition.y, 2)
+        );
+
+        // Only process if moved more than 5 pixels
+        // <!-- 5픽셀 이상 이동한 경우에만 처리 -->
+        if (moveDistance > 5 && onEventDrop) {
+          // Find drop target element
+          // <!-- 드롭 대상 요소 찾기 -->
+          const dropElement = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+          const cell = dropElement?.closest('td') as HTMLElement;
+
+          if (cell) {
+            // Extract date from cell's data-date attribute
+            // <!-- 셀의 data-date 속성에서 날짜 추출 -->
+            const newDate = cell.getAttribute('data-date');
+
+            if (newDate && newDate !== draggedEvent.date) {
+              // Only drop if date is different from original
+              // <!-- 원본 날짜와 다른 경우에만 드롭 -->
+              onEventDrop(draggedEvent, newDate, draggedEvent.startTime, draggedEvent.endTime);
+            }
+          }
+        }
+
+        // Remove highlight before resetting
+        // <!-- 리셋 전 하이라이트 제거 -->
+        if (highlightedCell) {
+          highlightedCell.style.backgroundColor = '';
+          setHighlightedCell(null);
+        }
+
+        // Reset drag state
+        // <!-- 드래그 상태 리셋 -->
         setDraggedEvent(null);
         setDragStartPosition(null);
         document.body.style.cursor = '';
@@ -149,9 +173,14 @@ export default function WeekView({
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUpGlobal);
         document.body.style.cursor = '';
+        // Clean up highlight on unmount
+        // <!-- 언마운트 시 하이라이트 정리 -->
+        if (highlightedCell) {
+          highlightedCell.style.backgroundColor = '';
+        }
       };
     }
-  }, [draggedEvent]);
+  }, [draggedEvent, dragStartPosition, onEventDrop, highlightedCell]);
 
   return (
     <Stack data-testid="week-view" spacing={4} sx={{ width: '100%' }}>
@@ -179,6 +208,7 @@ export default function WeekView({
                 return (
                   <TableCell
                     key={date.toISOString()}
+                    data-date={dateString}
                     onClick={() => {
                       if (isEmpty && onDateClick) {
                         onDateClick(dateString);
