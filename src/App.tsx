@@ -139,6 +139,62 @@ function App() {
     }
   };
 
+  const formatDateToString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleEventDrop = async (event: Event, newDate: Date) => {
+    const newDateString = formatDateToString(newDate);
+    const isRecurring = event.repeat.type !== 'none' && event.repeat.interval > 0;
+
+    const updatedEvent: Event = {
+      ...event,
+      date: newDateString,
+      // 반복 일정을 드래그하면 단일 일정으로 변환
+      repeat: isRecurring
+        ? {
+            type: 'none',
+            interval: 0,
+          }
+        : event.repeat,
+    };
+
+    // 겹침 검사
+    const overlapping = findOverlappingEvents(
+      updatedEvent,
+      events.filter((e) => e.id !== event.id)
+    );
+    if (overlapping.length > 0) {
+      setOverlappingEvents(overlapping);
+      setIsOverlapDialogOpen(true);
+      // 겹침 다이얼로그에서 확인하면 저장되도록 설정
+      setEditingEvent(updatedEvent);
+      return;
+    }
+
+    // 일정 업데이트 (updatedEvent에 id가 있으므로 saveEvent가 자동으로 업데이트 모드로 처리함)
+    await saveEvent(updatedEvent);
+    enqueueSnackbar('일정이 이동되었습니다', { variant: 'success' });
+  };
+
+  const handleDateClick = (date: Date) => {
+    // 해당 날짜에 일정이 있는지 확인
+    const dateString = formatDateToString(date);
+    const hasEventsOnDate = filteredEvents.some(
+      (event) => new Date(event.date).toDateString() === date.toDateString()
+    );
+
+    // 일정이 없는 경우에만 폼에 날짜 채우기
+    if (!hasEventsOnDate) {
+      resetForm();
+      setDate(dateString);
+      setEditingEvent(null);
+    }
+  };
+
   const addOrUpdateEvent = async () => {
     if (!title || !date || !startTime || !endTime) {
       enqueueSnackbar('필수 정보를 모두 입력해주세요.', { variant: 'error' });
@@ -257,6 +313,8 @@ function App() {
               currentDate={currentDate}
               filteredEvents={filteredEvents}
               notifiedEvents={notifiedEvents}
+              onEventDrop={handleEventDrop}
+              onDateClick={handleDateClick}
             />
           )}
           {view === 'month' && (
@@ -265,6 +323,8 @@ function App() {
               filteredEvents={filteredEvents}
               notifiedEvents={notifiedEvents}
               holidays={holidays}
+              onEventDrop={handleEventDrop}
+              onDateClick={handleDateClick}
             />
           )}
         </Stack>
