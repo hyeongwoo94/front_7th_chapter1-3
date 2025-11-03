@@ -1,5 +1,17 @@
 import { Notifications, Repeat } from '@mui/icons-material';
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+
 import { Event, RepeatType } from '../types';
 import { formatWeek, getWeekDates } from '../utils/dateUtils';
 
@@ -126,4 +138,3 @@ export default function WeekView({ currentDate, filteredEvents, notifiedEvents }
     </Stack>
   );
 }
-

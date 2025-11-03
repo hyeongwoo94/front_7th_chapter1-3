@@ -7,7 +7,8 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import { Event, EventForm } from '../types';
+
+import { Event } from '../types';
 
 interface OverlapDialogProps {
   open: boolean;
@@ -43,4 +44,3 @@ export default function OverlapDialog({
     </Dialog>
   );
 }
-

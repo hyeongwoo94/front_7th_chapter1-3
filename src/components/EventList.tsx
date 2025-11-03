@@ -1,15 +1,16 @@
 import { FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
+
 import { Event } from '../types';
 import EventItem from './EventItem.tsx';
 
 interface EventListProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
+  setSearchTerm: (_value: string) => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   notificationOptions: Array<{ value: number; label: string }>;
-  onEditEvent: (event: Event) => void;
-  onDeleteEvent: (event: Event) => void;
+  onEditEvent: (_event: Event) => void;
+  onDeleteEvent: (_event: Event) => void;
 }
 
 export default function EventList({
@@ -55,4 +56,3 @@ export default function EventList({
     </Stack>
   );
 }
-

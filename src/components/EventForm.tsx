@@ -1,34 +1,48 @@
-import { Checkbox, FormControl, FormControlLabel, FormLabel, MenuItem, Select, Stack, TextField, Button, Tooltip, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Button,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import React from 'react';
+
 import { RepeatType } from '../types';
 
 interface EventFormProps {
   title: string;
-  setTitle: (value: string) => void;
+  setTitle: (_value: string) => void;
   date: string;
-  setDate: (value: string) => void;
+  setDate: (_value: string) => void;
   startTime: string;
   endTime: string;
   description: string;
-  setDescription: (value: string) => void;
+  setDescription: (_value: string) => void;
   location: string;
-  setLocation: (value: string) => void;
+  setLocation: (_value: string) => void;
   category: string;
-  setCategory: (value: string) => void;
+  setCategory: (_value: string) => void;
   isRepeating: boolean;
-  setIsRepeating: (value: boolean) => void;
+  setIsRepeating: (_value: boolean) => void;
   repeatType: RepeatType;
-  setRepeatType: (value: RepeatType) => void;
+  setRepeatType: (_value: RepeatType) => void;
   repeatInterval: number;
-  setRepeatInterval: (value: number) => void;
+  setRepeatInterval: (_value: number) => void;
   repeatEndDate: string;
-  setRepeatEndDate: (value: string) => void;
+  setRepeatEndDate: (_value: string) => void;
   notificationTime: number;
-  setNotificationTime: (value: number) => void;
+  setNotificationTime: (_value: number) => void;
   startTimeError: string | null;
   endTimeError: string | null;
   editingEvent: { id: string } | null;
-  handleStartTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleEndTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleStartTimeChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleEndTimeChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
 }
 
@@ -263,4 +277,3 @@ export default function EventForm({
     </Stack>
   );
 }
-

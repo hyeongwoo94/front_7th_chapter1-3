@@ -10,10 +10,7 @@ interface NotificationStackProps {
   onRemove: (index: number) => void;
 }
 
-export default function NotificationStack({
-  notifications,
-  onRemove,
-}: NotificationStackProps) {
+export default function NotificationStack({ notifications, onRemove }: NotificationStackProps) {
   if (notifications.length === 0) {
     return null;
   }
@@ -37,4 +34,3 @@ export default function NotificationStack({
     </Stack>
   );
 }
-

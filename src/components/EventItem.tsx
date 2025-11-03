@@ -1,13 +1,14 @@
 import { Notifications, Repeat, Edit, Delete } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+
 import { Event, RepeatType } from '../types';
 
 interface EventItemProps {
   event: Event;
   isNotified: boolean;
   notificationOptions: Array<{ value: number; label: string }>;
-  onEdit: (event: Event) => void;
-  onDelete: (event: Event) => void;
+  onEdit: (_event: Event) => void;
+  onDelete: (_event: Event) => void;
 }
 
 const getRepeatTypeLabel = (type: RepeatType): string => {
@@ -89,4 +90,3 @@ export default function EventItem({
     </Box>
   );
 }
-

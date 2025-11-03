@@ -1,14 +1,15 @@
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+
 import { Event } from '../types';
 import MonthView from './MonthView.tsx';
 import WeekView from './WeekView.tsx';
 
 interface CalendarViewProps {
   view: 'week' | 'month';
-  setView: (view: 'week' | 'month') => void;
+  setView: (_view: 'week' | 'month') => void;
   currentDate: Date;
-  navigate: (direction: 'prev' | 'next') => void;
+  navigate: (_direction: 'prev' | 'next') => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   holidays: Record<string, string>;
@@ -67,4 +68,3 @@ export default function CalendarView({
     </Stack>
   );
 }
-

@@ -1,3 +1,4 @@
+import { Box, Stack } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
@@ -14,7 +15,6 @@ import { useNotifications } from './hooks/useNotifications.ts';
 import { useRecurringEventOperations } from './hooks/useRecurringEventOperations.ts';
 import { useSearch } from './hooks/useSearch.ts';
 import { Event, EventForm as EventFormType } from './types.ts';
-import { Box, Stack } from '@mui/material';
 import { findOverlappingEvents } from './utils/eventOverlap.ts';
 
 const notificationOptions = [
@@ -200,22 +200,22 @@ function App() {
   };
 
   const handleOverlapConfirm = async () => {
-              setIsOverlapDialogOpen(false);
+    setIsOverlapDialogOpen(false);
     const eventData: Event | EventFormType = {
-                id: editingEvent ? editingEvent.id : undefined,
-                title,
-                date,
-                startTime,
-                endTime,
-                description,
-                location,
-                category,
-                repeat: {
-                  type: isRepeating ? repeatType : 'none',
-                  interval: repeatInterval,
-                  endDate: repeatEndDate || undefined,
-                },
-                notificationTime,
+      id: editingEvent ? editingEvent.id : undefined,
+      title,
+      date,
+      startTime,
+      endTime,
+      description,
+      location,
+      category,
+      repeat: {
+        type: isRepeating ? repeatType : 'none',
+        interval: repeatInterval,
+        endDate: repeatEndDate || undefined,
+      },
+      notificationTime,
     };
     await saveEvent(eventData);
   };
