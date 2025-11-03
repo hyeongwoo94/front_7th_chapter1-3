@@ -23,28 +23,17 @@ import React, { useState } from 'react';
 
 import { Event, RepeatType } from '../../types.ts';
 import { formatWeek, getWeekDates } from '../../utils/dateUtils.ts';
+import { getRepeatBackgroundColor } from '../../utils/repeatTypeColors.ts';
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-const eventBoxStyles = {
-  notified: {
-    backgroundColor: '#ffebee',
-    fontWeight: 'bold',
-    color: '#d32f2f',
-  },
-  normal: {
-    backgroundColor: '#f5f5f5',
-    fontWeight: 'normal',
-    color: 'inherit',
-  },
-  common: {
-    p: 0.5,
-    my: 0.5,
-    borderRadius: 1,
-    minHeight: '18px',
-    width: '100%',
-    overflow: 'hidden',
-  },
+const eventBoxCommonStyles = {
+  p: 0.5,
+  my: 0.5,
+  borderRadius: 1,
+  minHeight: '18px',
+  width: '100%',
+  overflow: 'hidden',
 } as const;
 
 const getRepeatTypeLabel = (type: RepeatType): string => {
@@ -90,12 +79,16 @@ const DraggableEventBox = ({ event, isNotified, isRepeating }: DraggableEventBox
       }
     : undefined;
 
+  const backgroundColor = getRepeatBackgroundColor(event.repeat.type, isNotified);
+
   return (
     <Box
       ref={setNodeRef}
       sx={{
-        ...eventBoxStyles.common,
-        ...(isNotified ? eventBoxStyles.notified : eventBoxStyles.normal),
+        ...eventBoxCommonStyles,
+        backgroundColor,
+        fontWeight: isNotified ? 'bold' : 'normal',
+        color: isNotified ? '#d32f2f' : 'inherit',
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isDragging ? 0.5 : 1,
         ...style,
@@ -251,8 +244,8 @@ const WeekView = ({
         {draggedEvent ? (
           <Box
             sx={{
-              ...eventBoxStyles.common,
-              ...eventBoxStyles.normal,
+              ...eventBoxCommonStyles,
+              backgroundColor: getRepeatBackgroundColor(draggedEvent.repeat.type, false),
               opacity: 0.8,
               transform: 'rotate(5deg)',
             }}

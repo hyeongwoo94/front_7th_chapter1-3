@@ -28,6 +28,7 @@ import {
   getEventsForDay,
   getWeeksAtMonth,
 } from '../../utils/dateUtils.ts';
+import { getRepeatBackgroundColor } from '../../utils/repeatTypeColors.ts';
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -75,13 +76,15 @@ const DraggableEventBox = ({ event, isNotified, isRepeating }: DraggableEventBox
       }
     : undefined;
 
+  const backgroundColor = getRepeatBackgroundColor(event.repeat.type, isNotified);
+
   return (
     <Box
       ref={setNodeRef}
       sx={{
         p: 0.5,
         my: 0.5,
-        backgroundColor: isNotified ? '#ffebee' : '#f5f5f5',
+        backgroundColor,
         borderRadius: 1,
         fontWeight: isNotified ? 'bold' : 'normal',
         color: isNotified ? '#d32f2f' : 'inherit',
@@ -279,7 +282,7 @@ const MonthView = ({
             sx={{
               p: 0.5,
               my: 0.5,
-              backgroundColor: '#f5f5f5',
+              backgroundColor: getRepeatBackgroundColor(draggedEvent.repeat.type, false),
               borderRadius: 1,
               opacity: 0.8,
               transform: 'rotate(5deg)',
