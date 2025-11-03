@@ -229,22 +229,22 @@ function App() {
   };
 
   const handleOverlapConfirm = async () => {
-    setIsOverlapDialogOpen(false);
+              setIsOverlapDialogOpen(false);
     const eventData: Event | EventFormType = {
-      id: editingEvent ? editingEvent.id : undefined,
-      title,
-      date,
-      startTime,
-      endTime,
-      description,
-      location,
-      category,
-      repeat: {
-        type: isRepeating ? repeatType : 'none',
-        interval: repeatInterval,
-        endDate: repeatEndDate || undefined,
-      },
-      notificationTime,
+                id: editingEvent ? editingEvent.id : undefined,
+                title,
+                date,
+                startTime,
+                endTime,
+                description,
+                location,
+                category,
+                repeat: {
+                  type: isRepeating ? repeatType : 'none',
+                  interval: repeatInterval,
+                  endDate: repeatEndDate || undefined,
+                },
+                notificationTime,
     };
     await saveEvent(eventData);
   };
