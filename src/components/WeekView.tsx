@@ -20,7 +20,9 @@ interface WeekViewProps {
   currentDate: Date;
   filteredEvents: Event[];
   notifiedEvents: string[];
+  // eslint-disable-next-line no-unused-vars
   onDateClick?: (date: string) => void;
+  // eslint-disable-next-line no-unused-vars
   onEventDrop?: (event: Event, newDate: string, newStartTime: string, newEndTime: string) => void;
 }
 
@@ -128,7 +130,8 @@ export default function WeekView({
         // Check if mouse moved enough to consider it a drag (not just a click)
         // <!-- 드래그로 간주할 만큼 마우스가 이동했는지 확인 (단순 클릭 아님) -->
         const moveDistance = Math.sqrt(
-          Math.pow(e.clientX - dragStartPosition.x, 2) + Math.pow(e.clientY - dragStartPosition.y, 2)
+          Math.pow(e.clientX - dragStartPosition.x, 2) +
+            Math.pow(e.clientY - dragStartPosition.y, 2)
         );
 
         // Only process if moved more than 5 pixels

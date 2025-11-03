@@ -7,13 +7,17 @@ import WeekView from './WeekView.tsx';
 
 interface CalendarViewProps {
   view: 'week' | 'month';
+  // eslint-disable-next-line no-unused-vars
   setView: (_view: 'week' | 'month') => void;
   currentDate: Date;
+  // eslint-disable-next-line no-unused-vars
   navigate: (_direction: 'prev' | 'next') => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   holidays: Record<string, string>;
+  // eslint-disable-next-line no-unused-vars
   onDateClick?: (date: string) => void;
+  // eslint-disable-next-line no-unused-vars
   onEventDrop?: (event: Event, newDate: string, newStartTime: string, newEndTime: string) => void;
 }
 

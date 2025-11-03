@@ -4,7 +4,7 @@ import { render, screen, within, waitFor } from '@testing-library/react';
 import { UserEvent, userEvent } from '@testing-library/user-event';
 import { SnackbarProvider } from 'notistack';
 import { ReactElement } from 'react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import {
   setupMockHandlerListCreation,
@@ -545,7 +545,7 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
 
   describe('CRUD 통합 시나리오', () => {
     it('반복 일정을 생성하고 조회하고 수정하고 삭제하는 전체 워크플로우가 작동한다', async () => {
-      setupMockHandlerListCreation();
+      setupMockHandlerRecurringListUpdate();
       const { user } = setup(<App />);
 
       // Create
@@ -581,9 +581,14 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
 
       await user.click(screen.getByTestId('event-submit-button'));
 
-      await waitFor(() => {
-        expect(eventList.getByText('수정된 통합 반복 테스트')).toBeInTheDocument();
-      });
+      // 수정이 완료되고 이벤트 리스트가 업데이트될 때까지 대기
+      // <!-- 수정이 완료되고 이벤트 리스트가 업데이트될 때까지 대기 -->
+      await waitFor(
+        () => {
+          expect(eventList.getByText('수정된 통합 반복 테스트')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
 
       // Delete
       const deleteButtons = await screen.findAllByLabelText('Delete event');

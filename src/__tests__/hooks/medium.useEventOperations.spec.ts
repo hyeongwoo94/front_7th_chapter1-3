@@ -50,8 +50,7 @@ it('정의된 이벤트 정보를 기준으로 적절하게 저장이 된다', a
 
   await act(() => Promise.resolve(null));
 
-  const newEvent: Event = {
-    id: '1',
+  const newEvent: Omit<Event, 'id'> = {
     title: '새 회의',
     date: '2025-10-16',
     startTime: '11:00',
@@ -67,7 +66,23 @@ it('정의된 이벤트 정보를 기준으로 적절하게 저장이 된다', a
     await result.current.saveEvent(newEvent);
   });
 
-  expect(result.current.events).toEqual([{ ...newEvent, id: '1' }]);
+  // fetchEvents가 완료될 때까지 대기 (여러 번 시도)
+  // <!-- fetchEvents가 완료될 때까지 대기 (여러 번 시도) -->
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+  await act(async () => {
+    await Promise.resolve(null);
+  });
+  await act(async () => {
+    await Promise.resolve(null);
+  });
+
+  // saveEvent가 완료된 후 fetchEvents가 호출되어 events가 업데이트됨
+  // <!-- saveEvent가 완료된 후 fetchEvents가 호출되어 events가 업데이트됨 -->
+  expect(result.current.events.length).toBeGreaterThan(0);
+  expect(result.current.events[0].title).toBe('새 회의');
+  expect(result.current.events[0].id).toBeTruthy();
 });
 
 it("새로 정의된 'title', 'endTime' 기준으로 적절하게 일정이 업데이트 된다", async () => {

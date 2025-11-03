@@ -74,12 +74,9 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
       await fetchEvents();
       onSave?.();
-      enqueueSnackbar(
-        isUpdate ? SUCCESS_MESSAGES.EVENT_UPDATED : SUCCESS_MESSAGES.EVENT_ADDED,
-        {
-          variant: 'success',
-        }
-      );
+      enqueueSnackbar(isUpdate ? SUCCESS_MESSAGES.EVENT_UPDATED : SUCCESS_MESSAGES.EVENT_ADDED, {
+        variant: 'success',
+      });
     } catch (error) {
       console.error('Error saving event:', error);
       enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
