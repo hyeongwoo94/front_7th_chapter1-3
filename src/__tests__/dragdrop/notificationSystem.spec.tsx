@@ -2,13 +2,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { render, screen, within, waitFor, act } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
 import { ReactElement } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import App from '../../App';
 import { server } from '../../setupTests';
-import { http, HttpResponse } from 'msw';
 
 const theme = createTheme();
 
@@ -72,7 +72,9 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
         expect(screen.getByText('일정 로딩 완료!')).toBeInTheDocument();
       });
 
-      expect(screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')
+      ).not.toBeInTheDocument();
 
       act(() => {
         vi.advanceTimersByTime(1000);
@@ -122,7 +124,9 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
         vi.advanceTimersByTime(1000);
       });
 
-      expect(screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')
+      ).not.toBeInTheDocument();
     });
 
     it('일정 시작 시간 이후에는 알림이 표시되지 않는다', async () => {
@@ -163,7 +167,9 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
         vi.advanceTimersByTime(1000);
       });
 
-      expect(screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -301,13 +307,17 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
         expect(screen.getByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')).toBeInTheDocument();
       });
 
-      const initialNotifications = screen.getAllByText('10분 후 알림 테스트 일정 일정이 시작됩니다.');
+      const initialNotifications = screen.getAllByText(
+        '10분 후 알림 테스트 일정 일정이 시작됩니다.'
+      );
 
       act(() => {
         vi.advanceTimersByTime(5000);
       });
 
-      const afterNotifications = screen.queryAllByText('10분 후 알림 테스트 일정 일정이 시작됩니다.');
+      const afterNotifications = screen.queryAllByText(
+        '10분 후 알림 테스트 일정 일정이 시작됩니다.'
+      );
       expect(afterNotifications.length).toBe(initialNotifications.length);
     });
   });
@@ -428,7 +438,9 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
       await user.click(closeButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')).not.toBeInTheDocument();
+        expect(
+          screen.queryByText('10분 후 알림 테스트 일정 일정이 시작됩니다.')
+        ).not.toBeInTheDocument();
       });
     });
   });
@@ -527,4 +539,3 @@ describe('알림 시스템 관련 노출 조건 검증', () => {
     });
   });
 });
-

@@ -13,6 +13,8 @@ interface CalendarViewProps {
   filteredEvents: Event[];
   notifiedEvents: string[];
   holidays: Record<string, string>;
+  onDateClick?: (date: string) => void;
+  onEventDrop?: (event: Event, newDate: string, newStartTime: string, newEndTime: string) => void;
 }
 
 export default function CalendarView({
@@ -23,6 +25,8 @@ export default function CalendarView({
   filteredEvents,
   notifiedEvents,
   holidays,
+  onDateClick,
+  onEventDrop,
 }: CalendarViewProps) {
   return (
     <Stack flex={1} spacing={5}>
@@ -55,6 +59,8 @@ export default function CalendarView({
           currentDate={currentDate}
           filteredEvents={filteredEvents}
           notifiedEvents={notifiedEvents}
+          onDateClick={onDateClick}
+          onEventDrop={onEventDrop}
         />
       )}
       {view === 'month' && (
@@ -63,6 +69,8 @@ export default function CalendarView({
           filteredEvents={filteredEvents}
           notifiedEvents={notifiedEvents}
           holidays={holidays}
+          onDateClick={onDateClick}
+          onEventDrop={onEventDrop}
         />
       )}
     </Stack>

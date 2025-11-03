@@ -128,6 +128,41 @@ function App() {
     }
   };
 
+  const handleEventDrop = async (
+    event: Event,
+    newDate: string,
+    newStartTime: string,
+    newEndTime: string
+  ) => {
+    // Check for overlaps before dropping
+    // <!-- 드롭 전 겹침 확인 -->
+    const updatedEvent = {
+      ...event,
+      date: newDate,
+      startTime: newStartTime,
+      endTime: newEndTime,
+    };
+    const overlapping = findOverlappingEvents(updatedEvent, events);
+
+    if (overlapping.length > 0) {
+      setOverlappingEvents(overlapping);
+      setIsOverlapDialogOpen(true);
+      return;
+    }
+
+    // Set editingEvent temporarily to use PUT method
+    // <!-- PUT 메서드를 사용하기 위해 editingEvent 임시 설정 -->
+    setEditingEvent(event);
+
+    // Update event with new date/time (saveEvent will show success message)
+    // <!-- 새 날짜/시간으로 일정 업데이트 (saveEvent가 성공 메시지를 표시함) -->
+    try {
+      await saveEvent(updatedEvent);
+    } finally {
+      setEditingEvent(null);
+    }
+  };
+
   const addOrUpdateEvent = async () => {
     if (!title || !date || !startTime || !endTime) {
       enqueueSnackbar('필수 정보를 모두 입력해주세요.', { variant: 'error' });
@@ -262,6 +297,11 @@ function App() {
           filteredEvents={filteredEvents}
           notifiedEvents={notifiedEvents}
           holidays={holidays}
+          onDateClick={(date) => {
+            resetForm();
+            setDate(date);
+          }}
+          onEventDrop={handleEventDrop}
         />
 
         <EventList
