@@ -14,6 +14,7 @@ interface DragState {
 }
 
 interface UseDragAndDropProps {
+  // eslint-disable-next-line no-unused-vars
   onDrop: (_event: Event, _newDate: string, _newStartTime: string, _newEndTime: string) => void;
 }
 

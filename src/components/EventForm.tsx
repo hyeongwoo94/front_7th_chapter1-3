@@ -17,31 +17,43 @@ import { RepeatType } from '../types';
 
 interface EventFormProps {
   title: string;
+  // eslint-disable-next-line no-unused-vars
   setTitle: (_value: string) => void;
   date: string;
+  // eslint-disable-next-line no-unused-vars
   setDate: (_value: string) => void;
   startTime: string;
   endTime: string;
   description: string;
+  // eslint-disable-next-line no-unused-vars
   setDescription: (_value: string) => void;
   location: string;
+  // eslint-disable-next-line no-unused-vars
   setLocation: (_value: string) => void;
   category: string;
+  // eslint-disable-next-line no-unused-vars
   setCategory: (_value: string) => void;
   isRepeating: boolean;
+  // eslint-disable-next-line no-unused-vars
   setIsRepeating: (_value: boolean) => void;
   repeatType: RepeatType;
+  // eslint-disable-next-line no-unused-vars
   setRepeatType: (_value: RepeatType) => void;
   repeatInterval: number;
+  // eslint-disable-next-line no-unused-vars
   setRepeatInterval: (_value: number) => void;
   repeatEndDate: string;
+  // eslint-disable-next-line no-unused-vars
   setRepeatEndDate: (_value: string) => void;
   notificationTime: number;
+  // eslint-disable-next-line no-unused-vars
   setNotificationTime: (_value: number) => void;
   startTimeError: string | null;
   endTimeError: string | null;
   editingEvent: { id: string } | null;
+  // eslint-disable-next-line no-unused-vars
   handleStartTimeChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
+  // eslint-disable-next-line no-unused-vars
   handleEndTimeChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
 }

@@ -28,6 +28,7 @@ const setup = (element: ReactElement) => {
 
 describe('날짜 클릭으로 일정 폼 자동 채우기', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 

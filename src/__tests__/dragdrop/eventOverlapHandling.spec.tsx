@@ -50,6 +50,7 @@ const saveSchedule = async (
 
 describe('일정 겹침 처리 방식 검증', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 

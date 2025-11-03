@@ -29,9 +29,10 @@ const DEFAULT_REPEAT_CONFIG = {
 /**
  * Custom hook for managing recurring event operations
  * Provides functionality for editing and deleting recurring events
+ * _events parameter is used in findRelatedRecurringEvents (line 63) and handleRecurringEdit (line 156) via closure
  */
 export const useRecurringEventOperations = (
-  events: Event[],
+  _events: Event[],
   updateEvents: (events: Event[]) => void
 ) => {
   const isRecurringEvent = (event: Event): boolean => {
@@ -57,7 +58,7 @@ export const useRecurringEventOperations = (
     }
 
     // Find ALL events that are part of the same recurring series
-    const seriesEvents = events.filter(
+    const seriesEvents = _events.filter(
       (event) => isRecurringEvent(event) && isSameRecurringSeries(event, targetEvent)
     );
 
@@ -150,7 +151,7 @@ export const useRecurringEventOperations = (
     updatedEvent: Event,
     editSingleOnly: boolean
   ): Promise<void> => {
-    const originalEvent = events.find((e) => e.id === updatedEvent.id);
+    const originalEvent = _events.find((e) => e.id === updatedEvent.id);
 
     if (!originalEvent) {
       await updateEventOnServer(updatedEvent);

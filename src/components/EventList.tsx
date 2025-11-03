@@ -5,11 +5,14 @@ import EventItem from './EventItem.tsx';
 
 interface EventListProps {
   searchTerm: string;
+  // eslint-disable-next-line no-unused-vars
   setSearchTerm: (_value: string) => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   notificationOptions: Array<{ value: number; label: string }>;
+  // eslint-disable-next-line no-unused-vars
   onEditEvent: (_event: Event) => void;
+  // eslint-disable-next-line no-unused-vars
   onDeleteEvent: (_event: Event) => void;
 }
 

@@ -28,6 +28,7 @@ const setup = (element: ReactElement) => {
 
 describe('검색 및 필터링 전반 검증', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 
@@ -270,6 +271,9 @@ describe('검색 및 필터링 전반 검증', () => {
       });
 
       await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+      await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'week-option' })).toBeInTheDocument();
+      });
       await user.click(screen.getByRole('option', { name: 'week-option' }));
 
       const weekView = within(screen.getByTestId('week-view'));
@@ -313,6 +317,9 @@ describe('검색 및 필터링 전반 검증', () => {
       const eventList = within(screen.getByTestId('event-list'));
 
       await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+      await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'week-option' })).toBeInTheDocument();
+      });
       await user.click(screen.getByRole('option', { name: 'week-option' }));
 
       await waitFor(() => {
@@ -386,6 +393,9 @@ describe('검색 및 필터링 전반 검증', () => {
       });
 
       await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+      await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'week-option' })).toBeInTheDocument();
+      });
       await user.click(screen.getByRole('option', { name: 'week-option' }));
 
       const searchInput = screen.getByPlaceholderText('검색어를 입력하세요');
@@ -491,6 +501,9 @@ describe('검색 및 필터링 전반 검증', () => {
       });
 
       await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+      await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'week-option' })).toBeInTheDocument();
+      });
       await user.click(screen.getByRole('option', { name: 'week-option' }));
 
       const eventList = within(screen.getByTestId('event-list'));
@@ -515,6 +528,9 @@ describe('검색 및 필터링 전반 검증', () => {
       });
 
       await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
+      await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'week-option' })).toBeInTheDocument();
+      });
       await user.click(screen.getByRole('option', { name: 'week-option' }));
 
       await user.click(screen.getByLabelText('Next'));

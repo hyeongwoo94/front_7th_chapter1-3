@@ -28,6 +28,7 @@ const setup = (element: ReactElement) => {
 
 describe('드래그 앤 드롭 기능', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 

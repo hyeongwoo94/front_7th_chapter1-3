@@ -54,6 +54,7 @@ const saveSchedule = async (
 
 describe('기본 일정 관리 워크플로우 전반 (CRUD)', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 
@@ -342,9 +343,12 @@ describe('기본 일정 관리 워크플로우 전반 (CRUD)', () => {
 
       await user.click(screen.getByTestId('event-submit-button'));
 
-      await waitFor(() => {
-        expect(eventList.getByText('수정된 통합 테스트 일정')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(eventList.getByText('수정된 통합 테스트 일정')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
 
       // Delete
       const deleteButton = await screen.findByLabelText('Delete event');

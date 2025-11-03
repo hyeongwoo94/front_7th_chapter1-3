@@ -7,6 +7,7 @@ interface Notification {
 
 interface NotificationStackProps {
   notifications: Notification[];
+  // eslint-disable-next-line no-unused-vars
   onRemove: (index: number) => void;
 }
 
@@ -17,13 +18,13 @@ export default function NotificationStack({ notifications, onRemove }: Notificat
 
   return (
     <Stack position="fixed" top={16} right={16} spacing={2} alignItems="flex-end">
-      {notifications.map((notification, index) => (
+      {notifications.map((notification, idx) => (
         <Alert
-          key={index}
+          key={idx}
           severity="info"
           sx={{ width: 'auto' }}
           action={
-            <IconButton size="small" onClick={() => onRemove(index)}>
+            <IconButton size="small" onClick={() => onRemove(idx)}>
               <Close />
             </IconButton>
           }

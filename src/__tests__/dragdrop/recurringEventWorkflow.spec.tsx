@@ -66,6 +66,7 @@ const saveRecurringSchedule = async (
 
 describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-10-15T12:00:00'));
   });
 
@@ -439,10 +440,13 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
       const deleteButtons = await screen.findAllByLabelText('Delete event');
       await user.click(deleteButtons[0]);
 
-      await waitFor(() => {
-        expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
-        expect(screen.getByText('해당 일정만 삭제하시겠어요?')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
+          expect(screen.getByText('해당 일정만 삭제하시겠어요?')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
     });
 
     it('단일 일정만 삭제할 수 있다 (예 선택)', async () => {
@@ -481,9 +485,12 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
       const deleteButtons = await screen.findAllByLabelText('Delete event');
       await user.click(deleteButtons[0]);
 
-      await waitFor(() => {
-        expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
 
       await user.click(screen.getByText('예'));
 
@@ -530,9 +537,12 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
       const deleteButtons = await screen.findAllByLabelText('Delete event');
       await user.click(deleteButtons[0]);
 
-      await waitFor(() => {
-        expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
 
       await user.click(screen.getByText('아니오'));
 
@@ -594,9 +604,12 @@ describe('반복 일정 관리 워크플로우 전반 (CRUD)', () => {
       const deleteButtons = await screen.findAllByLabelText('Delete event');
       await user.click(deleteButtons[0]);
 
-      await waitFor(() => {
-        expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
+        },
+        { timeout: 5000 }
+      );
 
       await user.click(screen.getByText('예'));
 

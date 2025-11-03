@@ -7,7 +7,9 @@ interface EventItemProps {
   event: Event;
   isNotified: boolean;
   notificationOptions: Array<{ value: number; label: string }>;
+  // eslint-disable-next-line no-unused-vars
   onEdit: (_event: Event) => void;
+  // eslint-disable-next-line no-unused-vars
   onDelete: (_event: Event) => void;
 }
 
