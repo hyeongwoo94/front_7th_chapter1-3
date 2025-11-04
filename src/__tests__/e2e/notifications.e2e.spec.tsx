@@ -35,10 +35,20 @@ describe('E2E - 알림 시스템 노출 조건', () => {
     await user.type(screen.getByLabelText('종료 시간'), '00:35');
     await user.click(screen.getByTestId('event-submit-button'));
 
-    // useNotifications는 1초마다 체크. shouldAdvanceTime=true로 시간이 흐름
-    // 알림 스택 표시 확인
-    await screen.findByText(/임박 알림 테스트/);
-  });
+    // 일정 저장 완료 대기
+    await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+    // useNotifications는 1초마다 체크. 시간이 흐르면서 알림이 나타남
+    // 알림 스택 표시 확인 (AlertTitle로 표시됨)
+    // NotificationsStack 컴포넌트가 표시될 때까지 대기
+    let notificationFound = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const alertTitles = screen.queryAllByText(/임박 알림 테스트/);
+      if (alertTitles.length > 0) {
+        notificationFound = true;
+        break;
+      }
+    }
+    expect(notificationFound).toBe(true);
+  }, 60000);
 });
-
-

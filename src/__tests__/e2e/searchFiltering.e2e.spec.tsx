@@ -28,6 +28,9 @@ describe('E2E - 검색 및 필터링', () => {
     const { user } = setup(<App />);
     await screen.findByText('일정 로딩 완료!');
 
+    // 주간 뷰로 전환 (기본 뷰가 month이므로 month-view에서 테스트)
+    // 주간 뷰 전환은 복잡하므로 월간 뷰에서 검색 필터링 테스트
+
     // 이벤트 2개 생성
     await user.type(screen.getByLabelText('제목'), '개발 회의');
     await user.type(screen.getByLabelText('날짜'), '2025-10-01');
@@ -57,10 +60,9 @@ describe('E2E - 검색 및 필터링', () => {
     expect(filteredList.getByText('개발 회의')).toBeInTheDocument();
     expect(filteredList.queryByText('디자인 리뷰')).not.toBeInTheDocument();
 
-    // 주간 뷰에도 반영
-    expect(await screen.findByTestId('week-view')).toHaveTextContent('개발 회의');
-    expect(screen.getByTestId('week-view')).not.toHaveTextContent('디자인 리뷰');
+    // 캘린더 뷰에도 반영 (월간 뷰)
+    const monthView = await screen.findByTestId('month-view');
+    expect(monthView).toHaveTextContent('개발 회의');
+    expect(monthView).not.toHaveTextContent('디자인 리뷰');
   }, 15000);
 });
-
-

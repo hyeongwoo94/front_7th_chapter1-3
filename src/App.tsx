@@ -163,7 +163,14 @@ function App() {
         : event.repeat,
     };
 
-    // 겹침 검사
+    // 일반 일정으로 풀린 경우 (반복 일정이 단일 일정으로 변환된 경우) 겹침 알림 없이 바로 저장
+    if (isRecurring) {
+      await saveEvent(updatedEvent);
+      enqueueSnackbar('일정이 이동되었습니다', { variant: 'success' });
+      return;
+    }
+
+    // 기존 일반 일정인 경우에만 겹침 검사
     const overlapping = findOverlappingEvents(
       updatedEvent,
       events.filter((e) => e.id !== event.id)
@@ -227,11 +234,43 @@ function App() {
       notificationTime,
     };
 
-    const overlapping = findOverlappingEvents(eventData, events);
-    const hasOverlapEvent = overlapping.length > 0;
-
     // 수정
     if (editingEvent) {
+      // 반복 일정 단일 편집인 경우에도 겹침 검사 필요
+      const isSingleRecurringEdit =
+        editingEvent.repeat.type !== 'none' &&
+        editingEvent.repeat.interval > 0 &&
+        recurringEditMode === true;
+
+      // 일반 일정으로 풀린 경우 (단일 편집된 반복 일정) 겹침 알림 없이 바로 저장
+      if (isSingleRecurringEdit) {
+        if (
+          editingEvent.repeat.type !== 'none' &&
+          editingEvent.repeat.interval > 0 &&
+          recurringEditMode !== null
+        ) {
+          await handleRecurringEdit(
+            {
+              ...eventData,
+              repeat: { type: 'none', interval: 0 },
+            } as Event,
+            recurringEditMode
+          );
+          setRecurringEditMode(null);
+        } else {
+          await saveEvent({
+            ...eventData,
+            repeat: { type: 'none', interval: 0 },
+          } as Event);
+        }
+        resetForm();
+        return;
+      }
+
+      // 기존 일반 일정이거나 반복 일정 전체 편집인 경우에만 겹침 검사
+      const overlapping = findOverlappingEvents(eventData, events);
+      const hasOverlapEvent = overlapping.length > 0;
+
       if (hasOverlapEvent) {
         setOverlappingEvents(overlapping);
         setIsOverlapDialogOpen(true);
@@ -255,6 +294,9 @@ function App() {
     }
 
     // 생성
+    const overlapping = findOverlappingEvents(eventData, events);
+    const hasOverlapEvent = overlapping.length > 0;
+
     if (isRepeating) {
       // 반복 생성은 반복 일정을 고려하지 않는다.
       await createRepeatEvent(eventData);
@@ -362,13 +404,22 @@ function App() {
       <OverlapWarningDialog
         open={isOverlapDialogOpen}
         overlappingEvents={overlappingEvents}
-        onCancel={() => setIsOverlapDialogOpen(false)}
-        onConfirm={() => {
+        onCancel={() => {
+          setIsOverlapDialogOpen(false);
+          setPendingOverlapSave(null);
+          setRecurringEditMode(null);
+        }}
+        onConfirm={async () => {
           setIsOverlapDialogOpen(false);
           if (pendingOverlapSave) {
             // 겹침 확인 시, 직전에 계산된 동일 객체를 저장하여 소실/덮어쓰기 방지
-            saveEvent(pendingOverlapSave);
+            await saveEvent(pendingOverlapSave);
             setPendingOverlapSave(null);
+            // 단일 편집 모드였다면 초기화
+            if (recurringEditMode === true) {
+              setRecurringEditMode(null);
+              resetForm();
+            }
           }
         }}
       />

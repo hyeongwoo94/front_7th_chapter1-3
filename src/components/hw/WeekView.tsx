@@ -90,7 +90,7 @@ const DraggableEventBox = ({ event, isNotified, isRepeating }: DraggableEventBox
         fontWeight: isNotified ? 'bold' : 'normal',
         color: isNotified ? '#d32f2f' : 'inherit',
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging ? 0 : 1,
         ...style,
       }}
       {...listeners}

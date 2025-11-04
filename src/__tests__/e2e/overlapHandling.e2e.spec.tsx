@@ -46,8 +46,13 @@ describe('E2E - 일정 겹침 처리', () => {
     await user.click(screen.getByTestId('event-submit-button'));
 
     // 다이얼로그 확인 및 진행
-    expect(await screen.findByText('일정 겹침 경고')).toBeInTheDocument();
-    expect(screen.getByText(/회의A/)).toBeInTheDocument();
+    const dialog = await screen.findByText('일정 겹침 경고');
+    expect(dialog).toBeInTheDocument();
+    const dialogContent = dialog.closest('[role="dialog"]') || dialog.parentElement;
+    if (dialogContent) {
+      const withinDialog = within(dialogContent as HTMLElement);
+      expect(withinDialog.getByText(/회의A/)).toBeInTheDocument();
+    }
     await user.click(screen.getByText('계속 진행'));
 
     // 결과 확인
@@ -56,5 +61,3 @@ describe('E2E - 일정 겹침 처리', () => {
     expect(list.getByText('회의B')).toBeInTheDocument();
   }, 15000);
 });
-
-

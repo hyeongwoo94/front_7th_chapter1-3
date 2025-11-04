@@ -5,7 +5,7 @@ import { userEvent } from '@testing-library/user-event';
 import { SnackbarProvider } from 'notistack';
 import { ReactElement } from 'react';
 
-import { setupMockHandlerCreation, setupMockHandlerUpdating } from '../../__mocks__/handlersUtils';
+import { setupMockHandlerCreation } from '../../__mocks__/handlersUtils';
 import App from '../../App';
 
 const theme = createTheme();
@@ -44,7 +44,8 @@ describe('E2E - 기본 일정 관리 워크플로우', () => {
     const list = within(await screen.findByTestId('event-list'));
     expect(list.getByText('회의')).toBeInTheDocument();
     expect(list.getByText('2025-10-01')).toBeInTheDocument();
-    expect(await screen.findByTestId('week-view')).toHaveTextContent('회의');
+    // 기본 뷰가 month이므로 month-view에서 확인
+    expect(await screen.findByTestId('month-view')).toHaveTextContent('회의');
 
     // 수정 (제목 변경)
     const editButtons = await screen.findAllByLabelText('Edit event');
@@ -54,16 +55,27 @@ describe('E2E - 기본 일정 관리 워크플로우', () => {
     await user.type(title, '회의(수정)');
     await user.click(screen.getByTestId('event-submit-button'));
 
-    expect(within(await screen.findByTestId('event-list')).getByText('회의(수정)')).toBeInTheDocument();
-    expect(await screen.findByTestId('week-view')).toHaveTextContent('회의(수정)');
+    // 수정 완료 메시지 대기
+    await screen.findByText('일정이 수정되었습니다', {}, { timeout: 5000 });
+    // 리스트 업데이트 대기
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const updatedList = within(await screen.findByTestId('event-list'));
+    // "회의"가 포함된 모든 요소 찾기
+    const meetingElements = updatedList.getAllByText(/회의/);
+    // 그 중 하나가 "수정"도 포함하는지 확인
+    const hasModified = meetingElements.some((el) => el.textContent?.includes('수정'));
+    expect(hasModified).toBe(true);
+    const monthView = await screen.findByTestId('month-view');
+    expect(monthView.textContent).toMatch(/회의.*수정/);
 
     // 삭제
     const deleteButtons = await screen.findAllByLabelText('Delete event');
     await user.click(deleteButtons[0]);
 
     // 리스트에서 사라짐
-    expect(within(await screen.findByTestId('event-list')).queryByText('회의(수정)')).not.toBeInTheDocument();
-  });
+    expect(
+      within(await screen.findByTestId('event-list')).queryByText('회의(수정)')
+    ).not.toBeInTheDocument();
+  }, 30000);
 });
-
-

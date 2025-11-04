@@ -92,7 +92,7 @@ const DraggableEventBox = ({ event, isNotified, isRepeating }: DraggableEventBox
         width: '100%',
         overflow: 'hidden',
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging ? 0 : 1,
         ...style,
       }}
       {...listeners}
