@@ -27,106 +27,7 @@
 - **Commit Rule**: Commit only when all tests pass
   <!-- 커밋 규칙: 모든 테스트가 통과한 후에만 커밋 -->
 
-## 2. Documentation & History
-<!-- 문서화 및 히스토리 -->
 
-Automatically execute the following rules for each conversation:
-<!-- 매 대화마다 다음 규칙을 자동으로 실행: -->
-
-1. Answer user's question
-   <!-- 사용자의 질문에 답변 -->
-
-2. **Save based on conversation type**:
-   <!-- 대화 유형에 따라 저장: -->
-   
-   **A. Review Request** (when user says "리뷰해"):
-   <!-- 리뷰 요청 (사용자가 "리뷰해"라고 말할 때): -->
-   - Save to `src/.cursor/agents/review/` folder ONLY (DO NOT save to history folder)
-   <!-- `src/.cursor/agents/review/` 폴더에만 저장 (history 폴더에 저장하지 않음) -->
-   - File naming: `YYYY-MM-DD_task-description.md`
-   <!-- 파일명: `YYYY-MM-DD_작업설명.md` -->
-   - Example: `2025-10-29_overlap-dialog-bug-fix.md`
-   <!-- 예시: `2025-10-29_overlap-dialog-bug-fix.md` -->
-   - Content: Formal code review report with Manager role
-   <!-- 내용: Manager 역할로 공식 코드 리뷰 보고서 -->
-   
-   **B. Request Document Creation** (when user says "작성해" and Planner creates PRD):
-   <!-- 요청 문서 작성 (사용자가 "작성해"라고 말하고 Planner가 PRD를 만들 때): -->
-   - Save to `src/.cursor/agents/request/` folder ONLY (DO NOT save to history folder)
-   <!-- `src/.cursor/agents/request/` 폴더에만 저장 (history 폴더에 저장하지 않음) -->
-   - File naming: `feature-name.md` (descriptive, kebab-case)
-   <!-- 파일명: `기능명.md` (설명적, kebab-case) -->
-   - Example: `recurring-event-delete-single-or-all.md`
-   <!-- 예시: `recurring-event-delete-single-or-all.md` -->
-   - Content: PRD document using `prd.md` template
-   <!-- 내용: `prd.md` 템플릿을 사용한 PRD 문서 -->
-   - Reason: Request document itself is sufficient documentation
-   <!-- 이유: 요청 문서 자체가 충분한 문서화임 -->
-   
-   **C. Regular Conversation** (all other cases):
-   <!-- 일반 대화 (다른 모든 경우): -->
-   - Save to `src/.cursor/agents/history/` folder with date-based folder structure
-   <!-- 날짜별 폴더 구조로 `src/.cursor/agents/history/` 폴더에 저장 -->
-   - **Folder and file naming rule**: `MMDD/MMDD_i.md` (date-folder/month-day_sequence)
-   <!-- 폴더 및 파일명 규칙: `MMDD/MMDD_i.md` (날짜폴더/월일_순번) -->
-   - Example: October 27th first file → `1027/1027_1.md`
-   <!-- 예시: 10월 27일 첫 번째 파일 → `1027/1027_1.md` -->
-   - Same day additional files increment sequence: `1027/1027_2.md`, `1027/1027_3.md`
-   <!-- 같은 날 추가 파일은 순번 증가: `1027/1027_2.md`, `1027/1027_3.md` -->
-   - Each day starts from sequence 1 (resets when date changes)
-   <!-- 매일 첫 파일은 항상 1번부터 시작 (날짜가 바뀌면 순번 리셋) -->
-   - **New date**: Automatically create new MMDD folder
-   <!-- 새 날짜: 자동으로 새 MMDD 폴더 생성 -->
-
-   **Auto-renumbering rule** (history folder only): When a history file is deleted, automatically renumber remaining files in that date folder
-   <!-- 자동 순번 재정렬 규칙 (history 폴더만): 히스토리 파일이 삭제되면 해당 날짜 폴더 내의 남은 파일들의 순번을 자동으로 재정렬 -->
-   - If `1028/1028_3.md` is deleted, renumber: `1028/1028_4.md` → `1028/1028_3.md`, `1028/1028_5.md` → `1028/1028_4.md`
-   <!-- `1028/1028_3.md`가 삭제되면: `1028/1028_4.md` → `1028/1028_3.md`, `1028/1028_5.md` → `1028/1028_4.md`로 재정렬 -->
-   - **Purpose**: Maintain sequential numbering without gaps for better readability within each date folder
-   <!-- 목적: 각 날짜 폴더 내에서 가독성을 위해 빈 순번 없이 연속적인 번호 유지 -->
-   - **Process**: List all files in date folder → Sort by sequence → Renumber starting from 1
-   <!-- 프로세스: 날짜 폴더의 모든 파일 나열 → 순서대로 정렬 → 1번부터 순번 재부여 -->
-   - Example sequence after deletion:
-   <!-- 삭제 후 순서 예시: -->
-     ```
-     Before: 1028/1028_1.md, 1028/1028_2.md, 1028/1028_4.md, 1028/1028_5.md  (3.md deleted)
-     After:  1028/1028_1.md, 1028/1028_2.md, 1028/1028_3.md, 1028/1028_4.md  (renumbered)
-     ```
-
-3. **File content format**:
-   <!-- 파일 내용 형식: -->
-   
-   **For history (regular conversation)**:
-   <!-- history용 (일반 대화): -->
-   ```markdown
-   질문 (원본):
-   YYYY-MM-DD
-   
-   질문: [사용자 질문]
-   
-   답변:
-   [AI 답변]
-   ```
-   
-   **For review (code review)**:
-   <!-- review용 (코드 리뷰): -->
-   ```markdown
-   # Code Review Report
-   
-   **Date**: YYYY-MM-DD
-   **Reviewer**: Manager (관리자)
-   **Reviewed By**: Worker (노동자)
-   **Task**: [Task description]
-   **PRD**: [PRD file path if applicable]
-   
-   ## Review Summary
-   [Comprehensive review content]
-   
-   ## Final Verdict
-   ✅ APPROVED / ⚠️ NEEDS REVISION / ❌ REJECTED
-   ```
-
-## 3. Agent System & Roles
 <!-- 에이전트 시스템 및 역할 -->
 
 - **Role-based work**: Use role-specific files in `src/.cursor/agents/people/` folder systematically
@@ -225,6 +126,13 @@ When receiving a command from the user, follow this documentation reading order:
 ### Command Processing Flow:
 <!-- 명령 처리 흐름: -->
 
+0. **Create Request PRD first**
+   <!-- 최우선: 요청 PRD 생성 -->
+   - Create `src/.cursor/agents/request/[feature-name].md` using `src/.cursor/agents/request/prd.md` template
+   <!-- `src/.cursor/agents/request/prd.md` 템플릿을 사용하여 `src/.cursor/agents/request/[feature-name].md` 생성 -->
+   - Present the request document to the user and WAIT for approval before implementation
+   <!-- 요청 문서를 사용자에게 제시하고, 구현 전에 승인 받을 때까지 대기 -->
+
 1. **User issues command** to King (건물주)
    <!-- 사용자가 King(건물주)에게 명령 발행 -->
    - Command follows `.cursorrules` basic rules
@@ -257,6 +165,8 @@ When receiving a command from the user, follow this documentation reading order:
    <!-- 작업 중 `doc/` 파일 확인 -->
    - Follow TDD, checklist, and test guidelines
    <!-- TDD, 체크리스트, 테스트 가이드라인 준수 -->
+   - Only after request PRD is approved
+   <!-- 요청 PRD 승인 이후에만 실행 -->
 
 ### Role Separation Rules (CRITICAL):
 <!-- 역할 분리 규칙 (필수): -->
@@ -711,6 +621,8 @@ import { Button } from '@mui/material';  // Wrong order
   <!-- 역할 정의: `src/.cursor/agents/people/` -->
   - History: `src/.cursor/agents/history/`
   <!-- 히스토리: `src/.cursor/agents/history/` -->
+  - Requests (PRD): `src/.cursor/agents/request/`
+  <!-- 요청(PRD): `src/.cursor/agents/request/` -->
 
 # ========================================
 # QUICK REFERENCE

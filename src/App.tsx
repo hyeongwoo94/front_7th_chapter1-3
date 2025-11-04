@@ -82,6 +82,7 @@ function App() {
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
+  const [pendingOverlapSave, setPendingOverlapSave] = useState<Event | EventForm | null>(null);
   const [isRecurringDialogOpen, setIsRecurringDialogOpen] = useState(false);
   const [pendingRecurringEdit, setPendingRecurringEdit] = useState<Event | null>(null);
   const [pendingRecurringDelete, setPendingRecurringDelete] = useState<Event | null>(null);
@@ -172,6 +173,7 @@ function App() {
       setIsOverlapDialogOpen(true);
       // 겹침 다이얼로그에서 확인하면 저장되도록 설정
       setEditingEvent(updatedEvent);
+      setPendingOverlapSave(updatedEvent);
       return;
     }
 
@@ -233,6 +235,7 @@ function App() {
       if (hasOverlapEvent) {
         setOverlappingEvents(overlapping);
         setIsOverlapDialogOpen(true);
+        setPendingOverlapSave(eventData);
         return;
       }
 
@@ -262,6 +265,7 @@ function App() {
     if (hasOverlapEvent) {
       setOverlappingEvents(overlapping);
       setIsOverlapDialogOpen(true);
+      setPendingOverlapSave(eventData);
       return;
     }
 
@@ -361,22 +365,11 @@ function App() {
         onCancel={() => setIsOverlapDialogOpen(false)}
         onConfirm={() => {
           setIsOverlapDialogOpen(false);
-          saveEvent({
-            id: editingEvent ? editingEvent.id : undefined,
-            title,
-            date,
-            startTime,
-            endTime,
-            description,
-            location,
-            category,
-            repeat: {
-              type: isRepeating ? repeatType : 'none',
-              interval: repeatInterval,
-              endDate: repeatEndDate || undefined,
-            },
-            notificationTime,
-          });
+          if (pendingOverlapSave) {
+            // 겹침 확인 시, 직전에 계산된 동일 객체를 저장하여 소실/덮어쓰기 방지
+            saveEvent(pendingOverlapSave);
+            setPendingOverlapSave(null);
+          }
         }}
       />
 
