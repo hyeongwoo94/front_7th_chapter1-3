@@ -8,4 +8,3 @@ import { Event } from '../types';
 export function shouldShowMoreButton(events: Event[]): boolean {
   return events.length >= 3;
 }
-

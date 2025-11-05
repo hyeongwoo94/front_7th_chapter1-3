@@ -304,4 +304,3 @@ describe('시나리오: 캘린더 일정 더보기 모달', () => {
     expect(within(modal2).getByText('회의 C')).toBeInTheDocument();
   }, 30000);
 });
-
