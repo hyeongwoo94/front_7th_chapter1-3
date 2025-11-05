@@ -1,6 +1,5 @@
 import { Delete, Repeat } from '@mui/icons-material';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -9,7 +8,6 @@ import {
   ListItem,
   ListItemText,
   Stack,
-  Typography,
 } from '@mui/material';
 import React from 'react';
 
@@ -90,10 +88,7 @@ const MoreEventsModal = ({
                 >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
                     {isRepeating && <Repeat data-testid="RepeatIcon" fontSize="small" />}
-                    <ListItemText
-                      primary={event.title}
-                      primaryTypographyProps={{ noWrap: true }}
-                    />
+                    <ListItemText primary={event.title} primaryTypographyProps={{ noWrap: true }} />
                     <IconButton
                       edge="end"
                       aria-label="Delete event"
@@ -119,4 +114,3 @@ const MoreEventsModal = ({
 };
 
 export default MoreEventsModal;
-
