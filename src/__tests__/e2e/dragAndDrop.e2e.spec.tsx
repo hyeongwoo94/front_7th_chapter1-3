@@ -296,4 +296,3 @@ describe('E2E - 드래그 앤 드롭 워크플로우', () => {
     expect(weekViewContainer.getByText('테스트 일정')).toBeInTheDocument();
   }, 30000);
 });
-

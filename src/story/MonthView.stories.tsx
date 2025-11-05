@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
-import { Event } from '../types';
 import MonthView from '../components/hw/MonthView';
+import { Event } from '../types';
 
 const meta: Meta<typeof MonthView> = {
   title: 'Components/MonthView',
@@ -228,4 +228,3 @@ const WithManyEventsStory = () => {
 export const WithManyEvents: Story = {
   render: () => <WithManyEventsStory />,
 };
-

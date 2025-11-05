@@ -48,7 +48,7 @@ describe('E2E - 날짜 클릭으로 일정 생성 워크플로우', () => {
     if (emptyCell) {
       const clickedDateISO = emptyCell.getAttribute('data-date');
       expect(clickedDateISO).toBeTruthy();
-      
+
       // ISO 형식을 YYYY-MM-DD로 변환 (handleDateClick이 formatDateToString을 사용)
       // formatDateToString과 동일한 방식으로 변환
       const dateObj = clickedDateISO ? new Date(clickedDateISO) : null;
@@ -236,4 +236,3 @@ describe('E2E - 날짜 클릭으로 일정 생성 워크플로우', () => {
     }
   }, 30000);
 });
-

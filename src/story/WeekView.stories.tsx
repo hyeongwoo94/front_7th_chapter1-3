@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
-import { Event } from '../types';
 import WeekView from '../components/hw/WeekView';
+import { Event } from '../types';
 
 const meta: Meta<typeof WeekView> = {
   title: 'Components/WeekView',
@@ -148,4 +148,3 @@ const WithNotificationsStory = () => {
 export const WithNotifications: Story = {
   render: () => <WithNotificationsStory />,
 };
-

@@ -47,4 +47,3 @@ const MonthViewStory = () => {
 export const MonthView: Story = {
   render: () => <MonthViewStory />,
 };
-
