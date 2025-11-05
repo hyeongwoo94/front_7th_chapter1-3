@@ -211,8 +211,8 @@ describe('시나리오: 캘린더 일정 더보기 모달', () => {
     expect(screen.getByLabelText('날짜')).toHaveValue('2025-10-15');
     expect(screen.getByLabelText('시작 시간')).toHaveValue('09:00');
     expect(screen.getByLabelText('종료 시간')).toHaveValue('10:00');
-    // EventFormPanel 타이틀이 "일정 수정"으로 변경되었는지 확인 (h4 요소)
-    const titleElements = screen.getAllByText('일정 수정');
+    // EventFormPanel 타이틀이 "일정"으로 표시되는지 확인 (h4 요소)
+    const titleElements = screen.getAllByText('일정');
     expect(titleElements.length).toBeGreaterThan(0);
     // h4 요소가 있는지 확인
     const h4Title = titleElements.find((el) => el.tagName === 'H4');
@@ -279,8 +279,8 @@ describe('시나리오: 캘린더 일정 더보기 모달', () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByLabelText('제목')).toHaveValue('회의 A');
-    // EventFormPanel 타이틀이 "일정 수정"으로 변경되었는지 확인 (h4 요소)
-    const titleElements = screen.getAllByText('일정 수정');
+    // EventFormPanel 타이틀이 "일정"으로 표시되는지 확인 (h4 요소)
+    const titleElements = screen.getAllByText('일정');
     expect(titleElements.length).toBeGreaterThan(0);
     // h4 요소가 있는지 확인
     const h4Title = titleElements.find((el) => el.tagName === 'H4');

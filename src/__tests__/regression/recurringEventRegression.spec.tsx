@@ -243,7 +243,8 @@ describe('반복 일정 회귀 테스트', () => {
       await screen.findByText('일정 로딩 완료!');
 
       // 겹치는 시간대에 반복 일정 생성
-      await user.click(screen.getAllByText('일정 추가')[0]);
+      // 버튼이 disabled 상태이므로 먼저 input 필드를 클릭해서 활성화
+      await user.click(screen.getByLabelText('제목'));
 
       await user.type(screen.getByLabelText('제목'), '새 반복 일정');
       await user.type(screen.getByLabelText('날짜'), '2025-10-15');

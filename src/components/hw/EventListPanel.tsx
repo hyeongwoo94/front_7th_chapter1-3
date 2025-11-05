@@ -102,10 +102,22 @@ const EventListPanel = ({
                 </Typography>
               </Stack>
               <Stack>
-                <IconButton aria-label="Edit event" onClick={() => onEdit(event)}>
+                <IconButton
+                  aria-label="Edit event"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(event);
+                  }}
+                >
                   <Edit />
                 </IconButton>
-                <IconButton aria-label="Delete event" onClick={() => onDelete(event)}>
+                <IconButton
+                  aria-label="Delete event"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(event);
+                  }}
+                >
                   <Delete />
                 </IconButton>
               </Stack>

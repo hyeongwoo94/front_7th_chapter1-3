@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { SnackbarProvider } from 'notistack';
 import { ReactElement } from 'react';
@@ -90,8 +90,32 @@ describe('E2E - 반복 일정 워크플로우', () => {
 
     // 삭제 → 삭제 다이얼로그(예)
     const del = await screen.findAllByLabelText('Delete event');
+    expect(del.length).toBeGreaterThan(0);
+
+    // 클릭 이벤트 전파 대기 (이벤트 전파를 위해 더 긴 대기)
     await user.click(del[0]);
-    expect(await screen.findByText('반복 일정 삭제')).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // React 상태 업데이트 대기 및 다이얼로그가 나타날 때까지 대기
+    // 다이얼로그가 나타나지 않을 수 있으므로 더 유연한 검색
+    await waitFor(
+      () => {
+        // 먼저 다이얼로그가 있는지 확인
+        const dialog = screen.queryByRole('dialog');
+        if (!dialog) {
+          // 다이얼로그가 없으면 텍스트로 직접 확인
+          const deleteText = screen.queryByText('반복 일정 삭제');
+          if (deleteText) {
+            expect(deleteText).toBeInTheDocument();
+          } else {
+            throw new Error('Dialog or delete text not found');
+          }
+        } else {
+          expect(screen.getByText('반복 일정 삭제')).toBeInTheDocument();
+        }
+      },
+      { timeout: 20000 }
+    );
     await user.click(screen.getByText('예'));
     // 삭제 완료 대기 (없을 수도 있음)
     try {

@@ -40,7 +40,8 @@ const saveSchedule = async (
 ) => {
   const { title, date, startTime, endTime, location, description, category, repeat } = form;
 
-  await user.click(screen.getAllByText('일정 추가')[0]);
+  // 버튼이 disabled 상태이므로 먼저 input 필드를 클릭해서 활성화
+  await user.click(screen.getByLabelText('제목'));
 
   await user.type(screen.getByLabelText('제목'), title);
   await user.type(screen.getByLabelText('날짜'), date);
