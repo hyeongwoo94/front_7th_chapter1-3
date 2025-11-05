@@ -29,7 +29,17 @@ const setup = (element: ReactElement) => {
   };
 };
 
-describe('반복 일정 워크플로우 통합 테스트', () => {
+/**
+ * E2E 테스트: 반복 일정 워크플로우
+ * 목적: 사용자 플로우 중심의 종단간 테스트 (App 컴포넌트 전체 렌더링)
+ *
+ * 참고: 통합 테스트는 hooks와 비즈니스 로직 연동 중심으로 별도 파일에 작성됨
+ * - recurringEventOperationsIntegration.spec.tsx
+ * - eventFormOperationsIntegration.spec.tsx
+ * - eventOperationsSearchIntegration.spec.tsx
+ * - eventOperationsNotificationsIntegration.spec.tsx
+ */
+describe('E2E: 반복 일정 워크플로우', () => {
   it('반복 일정을 생성하고 편집 다이얼로그가 나타나는지 확인한다', async () => {
     setupMockHandlerUpdating([
       {
