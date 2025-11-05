@@ -153,12 +153,19 @@ function App() {
   const handleEventDrop = async (event: Event, newDate: Date) => {
     const newDateString = formatDateToString(newDate);
     const isRecurring = event.repeat.type !== 'none' && event.repeat.interval > 0;
+    const isSameDate = event.date === newDateString; // 같은 날짜인지 확인 (시간 정보 무시)
+
+    // 같은 날짜에 드롭한 경우 반복일정을 일반일정으로 변환하지 않음
+    if (isRecurring && isSameDate) {
+      // 변경 없음이므로 저장하지 않음
+      return;
+    }
 
     const updatedEvent: Event = {
       ...event,
       date: newDateString,
-      // 반복 일정을 드래그하면 단일 일정으로 변환
-      repeat: isRecurring
+      // 반복 일정을 다른 날짜로 드래그하면 단일 일정으로 변환
+      repeat: isRecurring && !isSameDate
         ? {
             type: 'none',
             interval: 0,
@@ -167,7 +174,7 @@ function App() {
     };
 
     // 일반 일정으로 풀린 경우 (반복 일정이 단일 일정으로 변환된 경우) 겹침 알림 없이 바로 저장
-    if (isRecurring) {
+    if (isRecurring && !isSameDate) {
       await saveEvent(updatedEvent);
       enqueueSnackbar('일정이 이동되었습니다', { variant: 'success' });
       return;
