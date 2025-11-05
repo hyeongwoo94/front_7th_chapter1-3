@@ -9,6 +9,7 @@ import {
 import { Notifications, Repeat } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Stack,
   Table,
   TableBody,
@@ -22,6 +23,7 @@ import {
 import React, { useState } from 'react';
 
 import { Event, RepeatType } from '../../types.ts';
+import { shouldShowMoreButton } from '../../utils/calendarMoreEventsUtils.ts';
 import {
   formatDate,
   formatMonth,
@@ -56,6 +58,8 @@ interface MonthViewProps {
   onEventDrop?: (event: Event, newDate: Date) => void;
   // eslint-disable-next-line no-unused-vars
   onDateClick?: (date: Date) => void;
+  // eslint-disable-next-line no-unused-vars
+  onMoreEventsClick?: (date: string) => void;
 }
 
 interface DraggableEventBoxProps {
@@ -183,6 +187,7 @@ const MonthView = ({
   holidays,
   onEventDrop,
   onDateClick,
+  onMoreEventsClick,
 }: MonthViewProps) => {
   const weeks = getWeeksAtMonth(currentDate);
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
@@ -234,6 +239,16 @@ const MonthView = ({
                     const dateString = day ? formatDate(currentDate, day) : '';
                     const holiday = holidays[dateString];
                     const dayEvents = day ? getEventsForDay(filteredEvents, day) : [];
+                    const showMoreButton = shouldShowMoreButton(dayEvents);
+                    const displayedEvents = showMoreButton ? dayEvents.slice(0, 2) : dayEvents;
+                    const remainingCount = dayEvents.length - 2;
+
+                    const handleMoreButtonClick = (e: React.MouseEvent) => {
+                      e.stopPropagation(); // Prevent date click when clicking more button
+                      if (onMoreEventsClick && dateString) {
+                        onMoreEventsClick(dateString);
+                      }
+                    };
 
                     return (
                       <DroppableCell
@@ -252,7 +267,7 @@ const MonthView = ({
                                 {holiday}
                               </Typography>
                             )}
-                            {dayEvents.map((event) => {
+                            {displayedEvents.map((event) => {
                               const isNotified = notifiedEvents.includes(event.id);
                               const isRepeating = event.repeat.type !== 'none';
 
@@ -265,6 +280,22 @@ const MonthView = ({
                                 />
                               );
                             })}
+                            {showMoreButton && (
+                              <Button
+                                size="small"
+                                variant="text"
+                                onClick={handleMoreButtonClick}
+                                sx={{
+                                  mt: 0.5,
+                                  p: 0.5,
+                                  minWidth: 'auto',
+                                  fontSize: '0.7rem',
+                                  textTransform: 'none',
+                                }}
+                              >
+                                더보기 (+{remainingCount})
+                              </Button>
+                            )}
                           </>
                         )}
                       </DroppableCell>

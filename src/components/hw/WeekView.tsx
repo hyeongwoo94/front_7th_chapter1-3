@@ -9,6 +9,7 @@ import {
 import { Notifications, Repeat } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Stack,
   Table,
   TableBody,
@@ -22,7 +23,8 @@ import {
 import React, { useState } from 'react';
 
 import { Event, RepeatType } from '../../types.ts';
-import { formatWeek, getWeekDates } from '../../utils/dateUtils.ts';
+import { shouldShowMoreButton } from '../../utils/calendarMoreEventsUtils.ts';
+import { formatDate, formatWeek, getWeekDates } from '../../utils/dateUtils.ts';
 import { getRepeatBackgroundColor } from '../../utils/repeatTypeColors.ts';
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -59,6 +61,8 @@ interface WeekViewProps {
   onEventDrop?: (event: Event, newDate: Date) => void;
   // eslint-disable-next-line no-unused-vars
   onDateClick?: (date: Date) => void;
+  // eslint-disable-next-line no-unused-vars
+  onMoreEventsClick?: (date: string) => void;
 }
 
 interface DraggableEventBoxProps {
@@ -163,6 +167,7 @@ const WeekView = ({
   notifiedEvents,
   onEventDrop,
   onDateClick,
+  onMoreEventsClick,
 }: WeekViewProps) => {
   const weekDates = getWeekDates(currentDate);
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
@@ -213,13 +218,24 @@ const WeekView = ({
                   const dayEvents = filteredEvents.filter(
                     (event) => new Date(event.date).toDateString() === date.toDateString()
                   );
+                  const showMoreButton = shouldShowMoreButton(dayEvents);
+                  const displayedEvents = showMoreButton ? dayEvents.slice(0, 2) : dayEvents;
+                  const remainingCount = dayEvents.length - 2;
+                  const dateString = formatDate(date);
+
+                  const handleMoreButtonClick = (e: React.MouseEvent) => {
+                    e.stopPropagation(); // Prevent date click when clicking more button
+                    if (onMoreEventsClick) {
+                      onMoreEventsClick(dateString);
+                    }
+                  };
 
                   return (
                     <DroppableCell key={date.toISOString()} date={date} onDateClick={onDateClick}>
                       <Typography variant="body2" fontWeight="bold">
                         {date.getDate()}
                       </Typography>
-                      {dayEvents.map((event) => {
+                      {displayedEvents.map((event) => {
                         const isNotified = notifiedEvents.includes(event.id);
                         const isRepeating = event.repeat.type !== 'none';
 
@@ -232,6 +248,22 @@ const WeekView = ({
                           />
                         );
                       })}
+                      {showMoreButton && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={handleMoreButtonClick}
+                          sx={{
+                            mt: 0.5,
+                            p: 0.5,
+                            minWidth: 'auto',
+                            fontSize: '0.7rem',
+                            textTransform: 'none',
+                          }}
+                        >
+                          더보기 (+{remainingCount})
+                        </Button>
+                      )}
                     </DroppableCell>
                   );
                 })}

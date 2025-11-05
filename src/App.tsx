@@ -5,6 +5,7 @@ import { useState } from 'react';
 import EventFormPanel from './components/hw/EventFormPanel.tsx';
 import EventListPanel from './components/hw/EventListPanel.tsx';
 import MonthView from './components/hw/MonthView.tsx';
+import MoreEventsModal from './components/hw/MoreEventsModal.tsx';
 import NotificationsStack from './components/hw/NotificationsStack.tsx';
 import OverlapWarningDialog from './components/hw/OverlapWarningDialog.tsx';
 import ViewToolbar from './components/hw/ViewToolbar.tsx';
@@ -88,6 +89,8 @@ function App() {
   const [pendingRecurringDelete, setPendingRecurringDelete] = useState<Event | null>(null);
   const [recurringEditMode, setRecurringEditMode] = useState<boolean | null>(null); // true = single, false = all
   const [recurringDialogMode, setRecurringDialogMode] = useState<'edit' | 'delete'>('edit');
+  const [isMoreEventsModalOpen, setIsMoreEventsModalOpen] = useState(false);
+  const [selectedDateForModal, setSelectedDateForModal] = useState<string>('');
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -202,6 +205,33 @@ function App() {
       setDate(dateString);
       setEditingEvent(null);
     }
+  };
+
+  const handleMoreEventsClick = (date: string) => {
+    setSelectedDateForModal(date);
+    setIsMoreEventsModalOpen(true);
+  };
+
+  const handleModalEventClick = (event: Event) => {
+    // 모달에서 일정 클릭 시 수정 화면으로 이동 (오른쪽 리스트의 수정 아이콘 클릭과 동일한 동작)
+    handleEditEvent(event);
+  };
+
+  const handleModalDeleteClick = async (eventId: string) => {
+    // 모달에서 삭제 버튼 클릭 시 즉시 삭제 (확인 없이)
+    const eventToDelete = events.find((e) => e.id === eventId);
+    if (eventToDelete) {
+      handleDeleteEvent(eventToDelete);
+    }
+  };
+
+  // 모달에 표시할 일정 필터링 (선택한 날짜의 일정만)
+  const getEventsForModal = (): Event[] => {
+    if (!selectedDateForModal) return [];
+    return filteredEvents.filter((event) => {
+      // event.date와 selectedDateForModal은 모두 YYYY-MM-DD 형식이므로 직접 비교
+      return event.date === selectedDateForModal;
+    });
   };
 
   const addOrUpdateEvent = async () => {
@@ -361,6 +391,7 @@ function App() {
               notifiedEvents={notifiedEvents}
               onEventDrop={handleEventDrop}
               onDateClick={handleDateClick}
+              onMoreEventsClick={handleMoreEventsClick}
             />
           )}
           {view === 'month' && (
@@ -371,6 +402,7 @@ function App() {
               holidays={holidays}
               onEventDrop={handleEventDrop}
               onDateClick={handleDateClick}
+              onMoreEventsClick={handleMoreEventsClick}
             />
           )}
         </Stack>
@@ -434,6 +466,18 @@ function App() {
         onConfirm={handleRecurringConfirm}
         event={recurringDialogMode === 'edit' ? pendingRecurringEdit : pendingRecurringDelete}
         mode={recurringDialogMode}
+      />
+
+      <MoreEventsModal
+        open={isMoreEventsModalOpen}
+        onClose={() => {
+          setIsMoreEventsModalOpen(false);
+          setSelectedDateForModal('');
+        }}
+        events={getEventsForModal()}
+        selectedDate={selectedDateForModal}
+        onEventClick={handleModalEventClick}
+        onDeleteClick={handleModalDeleteClick}
       />
 
       <NotificationsStack
