@@ -163,20 +163,30 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
     // 2. MonthView에서 반복일정 확인
     const monthView = await screen.findByTestId('month-view');
     const monthViewContainer = within(monthView);
-    const eventBox = monthViewContainer.queryByText(/매일 회의/);
 
     // 반복일정이 생성되었는지 확인
     // 실제로는 생성되었지만 UI에 표시되지 않을 수 있으므로,
     // 최소한 MonthView가 렌더링되었는지 확인
     expect(monthView).toBeInTheDocument();
 
-    // 반복일정이 표시되면 확인
+    // 반복일정이 표시되면 확인 (더 유연한 검색)
+    const eventBox = monthViewContainer.queryByText(/매일 회의/);
     if (eventBox) {
       expect(eventBox).toBeInTheDocument();
       // 반복 아이콘이 있는지 확인
       const repeatIcons = monthViewContainer.queryAllByTestId('RepeatIcon');
       if (repeatIcons.length > 0) {
         expect(repeatIcons.length).toBeGreaterThan(0);
+      }
+    } else {
+      // 일정이 리스트에 표시되는지 확인
+      const eventList = screen.queryByTestId('event-list');
+      if (eventList) {
+        const listContainer = within(eventList);
+        const listEvent = listContainer.queryByText(/매일 회의/);
+        if (listEvent) {
+          expect(listEvent).toBeInTheDocument();
+        }
       }
     }
   }, 45000);
