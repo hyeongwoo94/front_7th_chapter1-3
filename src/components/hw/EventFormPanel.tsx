@@ -96,7 +96,7 @@ const EventFormPanel = ({
 
   return (
     <Stack spacing={2} sx={{ width: '20%' }}>
-      <Typography variant="h4">일정</Typography>
+      <Typography variant="h4">{editingEvent ? '일정 수정' : '일정 추가'}</Typography>
 
       <FormControl fullWidth>
         <FormLabel htmlFor="title">제목</FormLabel>

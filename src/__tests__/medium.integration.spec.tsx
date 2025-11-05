@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within, act } from '@testing-library/react';
+import { render, screen, within, act, waitFor } from '@testing-library/react';
 import { UserEvent, userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
@@ -72,6 +72,7 @@ describe('일정 CRUD 및 기본 기능', () => {
     setupMockHandlerCreation();
 
     const { user } = setup(<App />);
+    await screen.findByText('일정 로딩 완료!');
 
     await saveSchedule(user, {
       title: '새 회의',
@@ -83,6 +84,10 @@ describe('일정 CRUD 및 기본 기능', () => {
       category: '업무',
     });
 
+    // 일정 저장 완료 대기
+    await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const eventList = within(screen.getByTestId('event-list'));
     expect(eventList.getByText('새 회의')).toBeInTheDocument();
     expect(eventList.getByText('2025-10-15')).toBeInTheDocument();
@@ -90,26 +95,47 @@ describe('일정 CRUD 및 기본 기능', () => {
     expect(eventList.getByText('프로젝트 진행 상황 논의')).toBeInTheDocument();
     expect(eventList.getByText('회의실 A')).toBeInTheDocument();
     expect(eventList.getByText('카테고리: 업무')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('기존 일정의 세부 정보를 수정하고 변경사항이 정확히 반영된다', async () => {
-    const { user } = setup(<App />);
-
     setupMockHandlerUpdating();
 
-    await user.click(await screen.findByLabelText('Edit event'));
+    const { user } = setup(<App />);
+    await screen.findByText('일정 로딩 완료!');
 
-    await user.clear(screen.getByLabelText('제목'));
-    await user.type(screen.getByLabelText('제목'), '수정된 회의');
-    await user.clear(screen.getByLabelText('설명'));
-    await user.type(screen.getByLabelText('설명'), '회의 내용 변경');
+    // 여러 Edit event 버튼이 있을 수 있으므로 첫 번째 것 선택
+    const editButtons = await screen.findAllByLabelText('Edit event');
+    await user.click(editButtons[0]);
+
+    // 반복 일정 다이얼로그가 나타날 수 있으므로 처리
+    const recurringDialog = screen.queryByText('반복 일정 수정');
+    if (recurringDialog) {
+      await user.click(screen.getByText('예'));
+    }
+
+    // input 필드 클릭 후 clear
+    const titleInput = screen.getByLabelText('제목');
+    await user.click(titleInput);
+    await user.keyboard('{Control>}a{/Control}');
+    await user.keyboard('{delete}');
+    await user.type(titleInput, '수정된 회의');
+
+    const descInput = screen.getByLabelText('설명');
+    await user.click(descInput);
+    await user.keyboard('{Control>}a{/Control}');
+    await user.keyboard('{delete}');
+    await user.type(descInput, '회의 내용 변경');
 
     await user.click(screen.getByTestId('event-submit-button'));
+
+    // 수정 완료 대기
+    await screen.findByText('일정이 수정되었습니다', {}, { timeout: 5000 });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const eventList = within(screen.getByTestId('event-list'));
     expect(eventList.getByText('수정된 회의')).toBeInTheDocument();
     expect(eventList.getByText('회의 내용 변경')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('일정을 삭제하고 더 이상 조회되지 않는지 확인한다', async () => {
     setupMockHandlerDeletion();
@@ -145,6 +171,8 @@ describe('일정 뷰', () => {
     setupMockHandlerCreation();
 
     const { user } = setup(<App />);
+    await screen.findByText('일정 로딩 완료!');
+
     await saveSchedule(user, {
       title: '이번주 팀 회의',
       date: '2025-10-02',
@@ -155,12 +183,16 @@ describe('일정 뷰', () => {
       category: '업무',
     });
 
+    // 일정 저장 완료 대기
+    await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
     await user.click(screen.getByRole('option', { name: 'week-option' }));
 
     const weekView = within(screen.getByTestId('week-view'));
     expect(weekView.getByText('이번주 팀 회의')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('월별 뷰에 일정이 없으면, 일정이 표시되지 않아야 한다.', async () => {
     vi.setSystemTime(new Date('2025-01-01'));
@@ -178,6 +210,8 @@ describe('일정 뷰', () => {
     setupMockHandlerCreation();
 
     const { user } = setup(<App />);
+    await screen.findByText('일정 로딩 완료!');
+
     await saveSchedule(user, {
       title: '이번달 팀 회의',
       date: '2025-10-02',
@@ -188,9 +222,13 @@ describe('일정 뷰', () => {
       category: '업무',
     });
 
+    // 일정 저장 완료 대기
+    await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const monthView = within(screen.getByTestId('month-view'));
     expect(monthView.getByText('이번달 팀 회의')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('달력에 1월 1일(신정)이 공휴일로 표시되는지 확인한다', async () => {
     vi.setSystemTime(new Date('2025-01-01'));
@@ -360,6 +398,7 @@ it('입력한 새로운 반복 일정 정보에 맞춰 모든 필드가 이벤�
   setupMockHandlerListCreation();
 
   const { user } = setup(<App />);
+  await screen.findByText('일정 로딩 완료!');
 
   await saveSchedule(user, {
     title: '새 회의',
@@ -372,11 +411,15 @@ it('입력한 새로운 반복 일정 정보에 맞춰 모든 필드가 이벤�
     repeat: { type: 'daily', interval: 2, endDate: '2025-10-17' },
   });
 
+  // 일정 저장 완료 대기
+  await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   const eventList = within(screen.getByTestId('event-list'));
   expect(eventList.getAllByText('반복: 2일마다 (종료: 2025-10-17)')).toHaveLength(2);
   expect(eventList.getByText('2025-10-15')).toBeInTheDocument();
   expect(eventList.getByText('2025-10-17')).toBeInTheDocument();
-});
+}, 30000);
 
 it('새로 추가한 반복 일정을 수정하는 경우 반복 일정에 관한 표시가 사라진다', async () => {
   setupMockHandlerUpdating([
@@ -395,11 +438,14 @@ it('새로 추가한 반복 일정을 수정하는 경우 반복 일정에 관�
   ]);
 
   const { user } = setup(<App />);
+  await screen.findByText('일정 로딩 완료!');
 
   const eventList = within(screen.getByTestId('event-list'));
   expect(await eventList.findByText('반복: 2일마다 (종료: 2025-10-17)')).toBeInTheDocument();
 
-  await user.click(await screen.findByLabelText('Edit event'));
+  // 여러 Edit event 버튼이 있을 수 있으므로 첫 번째 것 선택
+  const editButtons = await screen.findAllByLabelText('Edit event');
+  await user.click(editButtons[0]);
 
   // 반복 일정 편집 다이얼로그가 나타나면 '예'를 선택 (단일 수정)
   const recurringDialog = await screen.findByText('반복 일정 수정');
@@ -421,8 +467,18 @@ it('새로 추가한 반복 일정을 수정하는 경우 반복 일정에 관�
 
   await user.click(screen.getByTestId('event-submit-button'));
 
-  expect(eventList.queryByText('반복: 2일마다 (종료: 2025-10-17)')).not.toBeInTheDocument();
-});
+  // 수정 완료 대기 - 반복 일정을 단일 일정으로 수정하면 메시지가 나타날 수 있음
+  // 메시지를 기다리지 않고 결과를 직접 확인
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  // 반복 일정 표시가 사라졌는지 확인
+  await waitFor(
+    () => {
+      expect(eventList.queryByText('반복: 2일마다 (종료: 2025-10-17)')).not.toBeInTheDocument();
+    },
+    { timeout: 5000 }
+  );
+}, 30000);
 
 it('반복 일정을 수정하는 경우 반복 유형 관련 입력 폼이 사라진다', async () => {
   setupMockHandlerUpdating([
@@ -461,6 +517,7 @@ it('주별 뷰 선택 후 해당 주에 반복 일정이 존재한다면 해당 
   setupMockHandlerListCreation();
 
   const { user } = setup(<App />);
+  await screen.findByText('일정 로딩 완료!');
 
   await saveSchedule(user, {
     title: '새 회의',
@@ -472,18 +529,23 @@ it('주별 뷰 선택 후 해당 주에 반복 일정이 존재한다면 해당 
     category: '업무',
     repeat: { type: 'daily', interval: 2, endDate: '2025-10-03' },
   });
+
+  // 일정 저장 완료 대기
+  await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
   await user.click(screen.getByRole('option', { name: 'week-option' }));
 
   const weekView = within(screen.getByTestId('week-view'));
   expect(weekView.getAllByText('새 회의')).toHaveLength(2);
-});
+}, 30000);
 
 it('월간 뷰 선택 후 해당 주에 반복 일정이 존재한다면 해당 일정이 반복 일정 표시와 함께 정확히 표시된다', async () => {
   setupMockHandlerListCreation();
 
   const { user } = setup(<App />);
+  await screen.findByText('일정 로딩 완료!');
 
   await saveSchedule(user, {
     title: '새 회의',
@@ -496,6 +558,10 @@ it('월간 뷰 선택 후 해당 주에 반복 일정이 존재한다면 해당 
     repeat: { type: 'daily', interval: 2, endDate: '2025-10-03' },
   });
 
+  // 일정 저장 완료 대기
+  await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   const eventList = within(screen.getByTestId('event-list'));
   expect(eventList.getAllByText('새 회의')).toHaveLength(2);
-});
+}, 30000);

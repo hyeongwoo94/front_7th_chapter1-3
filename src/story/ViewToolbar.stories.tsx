@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
-import ViewToolbar from './ViewToolbar';
+import ViewToolbar from '../components/hw/ViewToolbar';
 
 const meta: Meta<typeof ViewToolbar> = {
   title: 'Components/ViewToolbar',
@@ -47,3 +47,4 @@ const MonthViewStory = () => {
 export const MonthView: Story = {
   render: () => <MonthViewStory />,
 };
+

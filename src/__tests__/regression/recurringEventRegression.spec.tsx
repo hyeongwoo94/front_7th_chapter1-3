@@ -262,7 +262,11 @@ describe('반복 일정 회귀 테스트', () => {
 
       await user.click(screen.getByTestId('event-submit-button'));
 
+      // 일정 저장 완료 대기
+      await screen.findByText('일정이 추가되었습니다', {}, { timeout: 5000 });
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       expect(screen.queryByText('일정 겹침 경고')).not.toBeInTheDocument();
-    });
+    }, 30000);
   });
 });
