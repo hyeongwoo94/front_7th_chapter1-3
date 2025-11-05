@@ -165,12 +165,13 @@ function App() {
       ...event,
       date: newDateString,
       // 반복 일정을 다른 날짜로 드래그하면 단일 일정으로 변환
-      repeat: isRecurring && !isSameDate
-        ? {
-            type: 'none',
-            interval: 0,
-          }
-        : event.repeat,
+      repeat:
+        isRecurring && !isSameDate
+          ? {
+              type: 'none',
+              interval: 0,
+            }
+          : event.repeat,
     };
 
     // 일반 일정으로 풀린 경우 (반복 일정이 단일 일정으로 변환된 경우) 겹침 알림 없이 바로 저장

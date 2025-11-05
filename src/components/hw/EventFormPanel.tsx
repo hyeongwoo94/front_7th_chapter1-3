@@ -11,6 +11,7 @@ import {
   Typography,
   Button,
 } from '@mui/material';
+import { useState, useEffect } from 'react';
 import type React from 'react';
 
 import { RepeatType } from '../../types.ts';
@@ -81,9 +82,21 @@ const EventFormPanel = ({
   categories,
   onSubmit,
 }: EventFormPanelProps) => {
+  const [isFormInteracted, setIsFormInteracted] = useState(false);
+
+  // input 필드 클릭 시 버튼 활성화
+  const handleInputFocus = () => {
+    setIsFormInteracted(true);
+  };
+
+  // editingEvent가 변경되면 isFormInteracted 초기화
+  useEffect(() => {
+    setIsFormInteracted(false);
+  }, [editingEvent]);
+
   return (
     <Stack spacing={2} sx={{ width: '20%' }}>
-      <Typography variant="h4">{editingEvent ? '일정 수정' : '일정 추가'}</Typography>
+      <Typography variant="h4">일정</Typography>
 
       <FormControl fullWidth>
         <FormLabel htmlFor="title">제목</FormLabel>
@@ -92,6 +105,7 @@ const EventFormPanel = ({
           size="small"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onFocus={handleInputFocus}
         />
       </FormControl>
 
@@ -103,6 +117,7 @@ const EventFormPanel = ({
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          onFocus={handleInputFocus}
         />
       </FormControl>
 
@@ -117,6 +132,7 @@ const EventFormPanel = ({
               value={startTime}
               onChange={handleStartTimeChange}
               onBlur={() => getTimeErrorMessage(startTime, endTime)}
+              onFocus={handleInputFocus}
               error={!!startTimeError}
             />
           </Tooltip>
@@ -131,6 +147,7 @@ const EventFormPanel = ({
               value={endTime}
               onChange={handleEndTimeChange}
               onBlur={() => getTimeErrorMessage(startTime, endTime)}
+              onFocus={handleInputFocus}
               error={!!endTimeError}
             />
           </Tooltip>
@@ -144,6 +161,7 @@ const EventFormPanel = ({
           size="small"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          onFocus={handleInputFocus}
         />
       </FormControl>
 
@@ -154,6 +172,7 @@ const EventFormPanel = ({
           size="small"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          onFocus={handleInputFocus}
         />
       </FormControl>
 
@@ -164,6 +183,7 @@ const EventFormPanel = ({
           size="small"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          onFocus={handleInputFocus}
           aria-labelledby="category-label"
           aria-label="카테고리"
         >
@@ -206,6 +226,7 @@ const EventFormPanel = ({
               value={repeatType}
               aria-label="반복 유형"
               onChange={(e) => setRepeatType(e.target.value as RepeatType)}
+              onOpen={handleInputFocus}
             >
               <MenuItem value="daily" aria-label="daily-option">
                 매일
@@ -230,6 +251,7 @@ const EventFormPanel = ({
                 type="number"
                 value={repeatInterval}
                 onChange={(e) => setRepeatInterval(Number(e.target.value))}
+                onFocus={handleInputFocus}
                 slotProps={{ htmlInput: { min: 1 } }}
               />
             </FormControl>
@@ -241,6 +263,7 @@ const EventFormPanel = ({
                 type="date"
                 value={repeatEndDate}
                 onChange={(e) => setRepeatEndDate(e.target.value)}
+                onFocus={handleInputFocus}
               />
             </FormControl>
           </Stack>
@@ -254,6 +277,7 @@ const EventFormPanel = ({
           size="small"
           value={notificationTime}
           onChange={(e) => setNotificationTime(Number(e.target.value))}
+          onOpen={handleInputFocus}
         >
           {notificationOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -268,6 +292,7 @@ const EventFormPanel = ({
         onClick={onSubmit}
         variant="contained"
         color="primary"
+        disabled={!isFormInteracted}
       >
         {editingEvent ? '일정 수정' : '일정 추가'}
       </Button>

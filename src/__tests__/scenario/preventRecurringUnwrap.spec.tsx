@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { SnackbarProvider } from 'notistack';
 import { ReactElement } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { setupMockHandlerCreation, setupMockHandlerUpdating } from '../../__mocks__/handlersUtils';
 import App from '../../App';
@@ -43,13 +43,13 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
       },
     ]);
 
-    const { user } = setup(<App />);
+    setup(<App />);
     await screen.findByText('일정 로딩 완료!');
 
     // MonthView에서 반복일정 확인
     const monthView = await screen.findByTestId('month-view');
     const monthViewContainer = within(monthView);
-    
+
     // 일정이 표시되는지 확인 (텍스트가 여러 요소로 나뉠 수 있으므로 queryByText 사용)
     const eventBox = monthViewContainer.queryByText(/매일 회의/);
     expect(eventBox).toBeInTheDocument();
@@ -76,13 +76,13 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
       },
     ]);
 
-    const { user } = setup(<App />);
+    setup(<App />);
     await screen.findByText('일정 로딩 완료!');
 
     // MonthView에서 반복일정 확인
     const monthView = await screen.findByTestId('month-view');
     const monthViewContainer = within(monthView);
-    
+
     // 일정이 표시되는지 확인
     const eventBox = monthViewContainer.queryByText(/매주 회의/);
     expect(eventBox).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
     expect(weekView).toBeInTheDocument();
     const weekViewContainer = within(weekView);
     const weekEventBox = weekViewContainer.queryByText(/매일 회의/);
-    
+
     // 두 뷰 모두에서 반복일정이 표시되어야 함
     // MonthView는 확인되었고, WeekView는 뷰가 전환되었는지 확인
     expect(monthEventBox).toBeInTheDocument();
@@ -166,12 +166,12 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
     const monthView = await screen.findByTestId('month-view');
     const monthViewContainer = within(monthView);
     const eventBox = monthViewContainer.queryByText(/매일 회의/);
-    
+
     // 반복일정이 생성되었는지 확인
-    // 실제로는 생성되었지만 UI에 표시되지 않을 수 있으므로, 
+    // 실제로는 생성되었지만 UI에 표시되지 않을 수 있으므로,
     // 최소한 MonthView가 렌더링되었는지 확인
     expect(monthView).toBeInTheDocument();
-    
+
     // 반복일정이 표시되면 확인
     if (eventBox) {
       expect(eventBox).toBeInTheDocument();
@@ -183,4 +183,3 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
     }
   }, 45000);
 });
-

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { isSameDate } from '../../utils/dateComparisonUtils';
 
 describe('isSameDate', () => {
@@ -19,7 +20,7 @@ describe('isSameDate', () => {
     const date1 = '2025-11-04';
     const date2 = new Date('2025-11-04T09:00:00');
     const date3 = new Date('2025-11-04T14:00:00');
-    
+
     // date1과 date2는 같은 날짜로 판단되어야 함
     expect(isSameDate(date1, date2)).toBe(true);
     // date2와 date3도 같은 날짜로 판단되어야 함
@@ -30,7 +31,7 @@ describe('isSameDate', () => {
     const date1 = '2024-02-29'; // 윤년
     const date2 = '2024-02-29';
     const date3 = '2024-03-01';
-    
+
     expect(isSameDate(date1, date2)).toBe(true);
     expect(isSameDate(date1, date3)).toBe(false);
   });
@@ -39,7 +40,7 @@ describe('isSameDate', () => {
     const date1 = '2025-01-31';
     const date2 = '2025-01-31';
     const date3 = '2025-02-01';
-    
+
     expect(isSameDate(date1, date2)).toBe(true);
     expect(isSameDate(date1, date3)).toBe(false);
   });
@@ -47,15 +48,14 @@ describe('isSameDate', () => {
   it('년도가 다른 경우 false를 반환해야 한다', () => {
     const date1 = '2025-11-04';
     const date2 = '2024-11-04';
-    
+
     expect(isSameDate(date1, date2)).toBe(false);
   });
 
   it('월이 다른 경우 false를 반환해야 한다', () => {
     const date1 = '2025-11-04';
     const date2 = '2025-12-04';
-    
+
     expect(isSameDate(date1, date2)).toBe(false);
   });
 });
-
