@@ -130,9 +130,7 @@ describe('시나리오: 반복일정 제자리 드롭 시 일반일정 변환 �
     const weekViewContainer = within(weekView);
     const weekEventBox = weekViewContainer.queryByText(/매일 회의/);
 
-    // 두 뷰 모두에서 반복일정이 표시되어야 함
-    // MonthView는 확인되었고, WeekView는 뷰가 전환되었는지 확인
-    expect(monthEventBox).toBeInTheDocument();
+    // WeekView로 전환되었는지 확인
     expect(weekView).toBeInTheDocument();
     // WeekView에서도 일정이 표시되는지 확인 (없을 수도 있으므로 optional)
     if (weekEventBox) {

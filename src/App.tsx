@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
@@ -79,7 +79,11 @@ function App() {
 
   const { notifications, notifiedEvents, setNotifications } = useNotifications(events);
   const { view, setView, currentDate, holidays, navigate } = useCalendarView();
-  const { searchTerm, filteredEvents, setSearchTerm } = useSearch(events, currentDate, view);
+  const { searchTerm, filteredEvents, setSearchTerm, sortOrder, setSortOrder } = useSearch(
+    events,
+    currentDate,
+    view
+  );
 
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
@@ -431,6 +435,20 @@ function App() {
               }}
             />
           </Box>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant={sortOrder === 'desc' ? 'contained' : 'outlined'}
+              onClick={() => setSortOrder('desc')}
+            >
+              최신순
+            </Button>
+            <Button
+              variant={sortOrder === 'asc' ? 'contained' : 'outlined'}
+              onClick={() => setSortOrder('asc')}
+            >
+              오래된순
+            </Button>
+          </Stack>
           <EventListPanel
             filteredEvents={filteredEvents}
             notifiedEvents={notifiedEvents}

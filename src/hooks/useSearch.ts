@@ -1,18 +1,22 @@
 import { useMemo, useState } from 'react';
 
 import { Event } from '../types';
-import { getFilteredEvents } from '../utils/eventUtils';
+import { getFilteredEvents, sortEventsByDate } from '../utils/eventUtils';
 
 export const useSearch = (events: Event[], currentDate: Date, view: 'week' | 'month') => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // 'asc' = 오래된순, 'desc' = 최신순
 
   const filteredEvents = useMemo(() => {
-    return getFilteredEvents(events, searchTerm, currentDate, view);
-  }, [events, searchTerm, currentDate, view]);
+    const filtered = getFilteredEvents(events, searchTerm, currentDate, view);
+    return sortEventsByDate(filtered, sortOrder);
+  }, [events, searchTerm, currentDate, view, sortOrder]);
 
   return {
     searchTerm,
     setSearchTerm,
     filteredEvents,
+    sortOrder,
+    setSortOrder,
   };
 };

@@ -56,3 +56,23 @@ export function getFilteredEvents(
 
   return searchedEvents;
 }
+
+export function sortEventsByDate(events: Event[], order: 'asc' | 'desc'): Event[] {
+  return [...events].sort((a, b) => {
+    // 1순위: 날짜 비교
+    const dateCompare = a.date.localeCompare(b.date);
+    if (dateCompare !== 0) {
+      return order === 'asc' ? dateCompare : -dateCompare;
+    }
+
+    // 2순위: 시간 비교 (날짜가 같을 경우)
+    const timeCompare = a.startTime.localeCompare(b.startTime);
+    if (timeCompare !== 0) {
+      return order === 'asc' ? timeCompare : -timeCompare;
+    }
+
+    // 3순위: 제목 비교 (날짜와 시간이 모두 같을 경우)
+    const titleCompare = a.title.localeCompare(b.title);
+    return order === 'asc' ? titleCompare : -titleCompare;
+  });
+}
