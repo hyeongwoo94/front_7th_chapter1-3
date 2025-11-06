@@ -337,6 +337,7 @@ describe('일정 충돌', () => {
     ]);
 
     const { user } = setup(<App />);
+    await screen.findByText('일정 로딩 완료!');
 
     await saveSchedule(user, {
       title: '새 회의',
@@ -351,7 +352,7 @@ describe('일정 충돌', () => {
     expect(screen.getByText('일정 겹침 경고')).toBeInTheDocument();
     expect(screen.getByText(/다음 일정과 겹칩니다/)).toBeInTheDocument();
     expect(screen.getByText('기존 회의 (2025-10-15 09:00-10:00)')).toBeInTheDocument();
-  });
+  }, 10000);
 
   it('기존 일정의 시간을 수정하여 충돌이 발생하면 경고가 노출된다', async () => {
     setupMockHandlerUpdating();

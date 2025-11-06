@@ -1,18 +1,20 @@
-import { act, renderHook } from '@testing-library/react';
+import { act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { useEventForm } from '../../hooks/useEventForm';
-import { useEventOperations } from '../../hooks/useEventOperations';
+import {
+  setupBeforeEach,
+  setupEventForm,
+  setupEventOperations,
+  setupSaveEventMocks,
+} from './__helpers__/integrationTestUtils';
 import { Event } from '../../types';
-
-const enqueueSnackbarFn = vi.fn();
 
 vi.mock('notistack', async () => {
   const actual = await vi.importActual('notistack');
   return {
     ...actual,
     useSnackbar: () => ({
-      enqueueSnackbar: enqueueSnackbarFn,
+      enqueueSnackbar: vi.fn(),
     }),
   };
 });
@@ -23,8 +25,7 @@ vi.mock('notistack', async () => {
  */
 describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    global.fetch = vi.fn();
+    setupBeforeEach();
   });
 
   const mockEvent: Event = {
@@ -41,31 +42,13 @@ describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
   };
 
   it('editEvent 호출 시 editingEvent 상태가 설정되고, 이것이 useEventOperations의 editing 파라미터에 영향을 준다', async () => {
-    // useEventOperations 초기화 (초기 fetch mock)
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
-
     // useEventForm 초기화
-    const { result: eventFormResult } = renderHook(() => useEventForm());
+    const { result: eventFormResult } = setupEventForm();
 
     // useEventOperations 초기화 (editing 파라미터는 editingEvent 상태에 의존)
     const mockOnSave = vi.fn();
-    const { result: eventOperationsResult, rerender: rerenderOperations } = renderHook(
-      ({ editing }) => useEventOperations(editing, mockOnSave),
-      {
-        initialProps: {
-          editing: Boolean(eventFormResult.current.editingEvent),
-          onSave: mockOnSave,
-        },
-      }
-    );
-
-    // 초기 fetch 대기
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    const { result: eventOperationsResult, rerender: rerenderOperations } =
+      await setupEventOperations([], Boolean(eventFormResult.current.editingEvent), mockOnSave);
 
     // editEvent 호출
     act(() => {
@@ -83,17 +66,8 @@ describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
       onSave: mockOnSave,
     });
 
-    // editing 상태가 true인지 확인
-    // 실제로는 useEventOperations 내부에서 editing을 사용하므로, saveEvent 호출 시 업데이트 모드로 동작하는지 확인
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
-    // saveEvent 호출 후 fetchEvents가 호출되므로 추가 mock 필요
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
+    // saveEvent 호출을 위한 mock 설정
+    setupSaveEventMocks([]);
 
     await act(async () => {
       await eventOperationsResult.current.saveEvent({
@@ -111,14 +85,8 @@ describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
   });
 
   it('saveEvent 호출 시 onSave 콜백이 호출되어 editingEvent가 초기화된다', async () => {
-    // useEventOperations 초기화 (초기 fetch mock)
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
-
     // useEventForm 초기화
-    const { result: eventFormResult } = renderHook(() => useEventForm());
+    const { result: eventFormResult } = setupEventForm();
 
     // editEvent로 편집 모드 진입
     act(() => {
@@ -128,27 +96,16 @@ describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
     expect(eventFormResult.current.editingEvent).toEqual(mockEvent);
 
     // useEventOperations 초기화 (onSave 콜백으로 setEditingEvent(null) 전달)
-    const { result: eventOperationsResult } = renderHook(() =>
-      useEventOperations(Boolean(eventFormResult.current.editingEvent), () => {
+    const { result: eventOperationsResult } = await setupEventOperations(
+      [],
+      Boolean(eventFormResult.current.editingEvent),
+      () => {
         eventFormResult.current.setEditingEvent(null);
-      })
+      }
     );
 
-    // 초기 fetch 대기
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-
-    // saveEvent 호출 (PUT 요청 + fetchEvents 호출)
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
-    // saveEvent 호출 후 fetchEvents가 호출되므로 추가 mock 필요
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
+    // saveEvent 호출을 위한 mock 설정
+    setupSaveEventMocks([]);
 
     await act(async () => {
       await eventOperationsResult.current.saveEvent({
@@ -162,7 +119,7 @@ describe('통합 테스트: useEventForm ↔ useEventOperations 연동', () => {
   });
 
   it('resetForm 호출 시 모든 폼 상태가 초기화된다 (editingEvent는 별도로 초기화해야 함)', () => {
-    const { result: eventFormResult } = renderHook(() => useEventForm());
+    const { result: eventFormResult } = setupEventForm();
 
     // editEvent로 편집 모드 진입
     act(() => {

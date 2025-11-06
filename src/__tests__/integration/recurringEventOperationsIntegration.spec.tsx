@@ -1,18 +1,21 @@
-import { act, renderHook } from '@testing-library/react';
+import { act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { useEventOperations } from '../../hooks/useEventOperations';
-import { useRecurringEventOperations } from '../../hooks/useRecurringEventOperations';
+import {
+  setupBeforeEach,
+  setupEventOperations,
+  setupRecurringEventOperations,
+  setupRecurringEditMocks,
+  setupRecurringDeleteMocks,
+} from './__helpers__/integrationTestUtils';
 import { Event } from '../../types';
-
-const enqueueSnackbarFn = vi.fn();
 
 vi.mock('notistack', async () => {
   const actual = await vi.importActual('notistack');
   return {
     ...actual,
     useSnackbar: () => ({
-      enqueueSnackbar: enqueueSnackbarFn,
+      enqueueSnackbar: vi.fn(),
     }),
   };
 });
@@ -23,8 +26,7 @@ vi.mock('notistack', async () => {
  */
 describe('통합 테스트: useRecurringEventOperations ↔ useEventOperations 연동', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    global.fetch = vi.fn();
+    setupBeforeEach();
   });
 
   const mockRecurringEvents: Event[] = [
@@ -56,38 +58,20 @@ describe('통합 테스트: useRecurringEventOperations ↔ useEventOperations �
 
   it('handleRecurringEdit 호출 시 updateEvents 콜백으로 fetchEvents가 호출되어 events가 갱신된다', async () => {
     // useEventOperations 초기화
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: mockRecurringEvents }),
-    });
-
-    const { result: eventOperationsResult } = renderHook(() => useEventOperations(false));
-
-    // 초기 events 로딩 대기
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    const { result: eventOperationsResult } = await setupEventOperations(mockRecurringEvents);
 
     // useRecurringEventOperations 초기화 (updateEvents 콜백으로 fetchEvents 전달)
     const mockUpdateEvents = vi.fn();
-    const { result: recurringOperationsResult } = renderHook(() =>
-      useRecurringEventOperations(eventOperationsResult.current.events, async () => {
+    const { result: recurringOperationsResult } = setupRecurringEventOperations(
+      eventOperationsResult.current.events,
+      async () => {
         await eventOperationsResult.current.fetchEvents();
         mockUpdateEvents([]);
-      })
+      }
     );
 
-    // handleRecurringEdit 호출 (단일 수정)
-    // PUT 요청 mock
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
-    // handleRecurringEdit 호출 후 updateEvents 콜백에서 fetchEvents가 호출되므로 추가 mock 필요
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
+    // handleRecurringEdit 호출을 위한 mock 설정
+    setupRecurringEditMocks([]);
 
     const updatedEvent: Event = {
       ...mockRecurringEvents[0],
@@ -105,35 +89,20 @@ describe('통합 테스트: useRecurringEventOperations ↔ useEventOperations �
 
   it('handleRecurringDelete 호출 시 updateEvents 콜백으로 fetchEvents가 호출되어 events가 갱신된다', async () => {
     // useEventOperations 초기화
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: mockRecurringEvents }),
-    });
-
-    const { result: eventOperationsResult } = renderHook(() => useEventOperations(false));
-
-    // 초기 events 로딩 대기
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    const { result: eventOperationsResult } = await setupEventOperations(mockRecurringEvents);
 
     // useRecurringEventOperations 초기화 (updateEvents 콜백으로 fetchEvents 전달)
     const mockUpdateEvents = vi.fn();
-    const { result: recurringOperationsResult } = renderHook(() =>
-      useRecurringEventOperations(eventOperationsResult.current.events, async () => {
+    const { result: recurringOperationsResult } = setupRecurringEventOperations(
+      eventOperationsResult.current.events,
+      async () => {
         await eventOperationsResult.current.fetchEvents();
         mockUpdateEvents([]);
-      })
+      }
     );
 
-    // handleRecurringDelete 호출 (단일 삭제)
-    // DELETE 요청 mock
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: true });
-    // handleRecurringDelete 호출 후 updateEvents 콜백에서 fetchEvents가 호출되므로 추가 mock 필요
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: [] }),
-    });
+    // handleRecurringDelete 호출을 위한 mock 설정
+    setupRecurringDeleteMocks([]);
 
     await act(async () => {
       await recurringOperationsResult.current.handleRecurringDelete(mockRecurringEvents[0], true);
@@ -146,21 +115,12 @@ describe('통합 테스트: useRecurringEventOperations ↔ useEventOperations �
 
   it('findRelatedRecurringEvents가 events 배열을 기반으로 올바르게 관련 이벤트를 찾는다', async () => {
     // useEventOperations 초기화
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ events: mockRecurringEvents }),
-    });
-
-    const { result: eventOperationsResult } = renderHook(() => useEventOperations(false));
-
-    // 초기 events 로딩 대기
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    const { result: eventOperationsResult } = await setupEventOperations(mockRecurringEvents);
 
     // useRecurringEventOperations 초기화
-    const { result: recurringOperationsResult } = renderHook(() =>
-      useRecurringEventOperations(eventOperationsResult.current.events, vi.fn())
+    const { result: recurringOperationsResult } = setupRecurringEventOperations(
+      eventOperationsResult.current.events,
+      vi.fn()
     );
 
     // findRelatedRecurringEvents가 events 배열을 기반으로 올바르게 작동하는지 확인
